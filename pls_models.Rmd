@@ -1,0 +1,450 @@
+---
+output:
+  html_document:
+    df_print: paged
+    fig.align: center
+    self_contained: yes 
+    fig.height: 4
+    fig.width: 8
+    theme: united
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    number_sections: yes
+    code_folding: hide
+title: "pls models"
+author: "David Lilek"
+date: "`r format(Sys.time(), '%d %B %Y, %X')`"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# nir
+
+```{r, fig.width=8,fig.height=4}
+###################################################
+#
+#Ausreiszer entfernen
+#Spektralen Bereich einschraenken
+#
+###################################################
+
+ #Ausreiszer entfernen
+# Spectra_101 <- Spectra_100
+# Spectra_101 <- Spectra_101[-c(4),]
+#  
+# Reference_101 <- Reference_100
+# Reference_101 <- Reference_101[-c(4)]
+#  
+# #Spektralen Bereich einschraenken
+# Spectra_101[,c(1:200,610:1140,1715:1762)] <- 0
+# Wellenzahl_101 <- Wellenzahl_100
+#  
+# #Spektren als Matrix abspeichern
+# Spectra_101 <- data.matrix(Spectra_101) 
+# #Dataframe erstellen
+# Data_101 <- data.frame(Reference=I(Reference_101),Spektren=(Spectra_101))
+# # 
+# # 
+# # ##################################################
+# # #
+# # #Daten visualsieren
+# # #
+# # ###################################################
+# # 
+# # matplot(Wellenzahl_101,t(Spectra_101),lty=1,type="l",ylab="Absorbance")
+# # 
+# # ##################################################
+# # #
+# # #PLS_101 Modell erstellen
+# # #
+# # ###################################################
+# # 
+# # ### PLS Modell erstellen
+# # #Algorithmus einstellen
+# options(digits = 4)
+# pls.options(plsalg="oscorespls")
+# PLS_101 <- plsr(Reference_101 ~ Spectra_101, data=Data_101, ncomp=7, val="LOO")
+# saveRDS(PLS_101,"PLS_101_NIR.RDS")
+# saveRDS(reference_101,"Reference_101_NIR.RDS")
+
+library(pls)
+PLS_101 <- readRDS("PLS_101_NIR.RDS")
+Reference_101 <- readRDS("Reference_101_NIR.RDS")
+#############
+#
+#Ergebnisse PLS_101 Modell
+#
+#############
+
+###Zusammenfassung
+summary(PLS_101)
+
+###RMSEP
+plot(RMSEP(PLS_101), legendpos = "topright",main="RMSEP vs. Faktoren PLS_101")
+
+###Predicted vs. Measured ncomp=Anzahl der Kompnenten
+plot(PLS_101, ncomp = 10, line = TRUE,main="Predicted vs. Measured PLS_101")
+
+#Predicted vs. Measured inkl. Geradengleichung und Bestimmtheitsmasz; Faktor eingeben und ausfuehren
+Faktor <- 10
+
+YY <- length(Reference_101[!is.na(Reference_101)])
+B <- Faktor*YY
+A <- (B-YY)+1  
+predicted_101 <- PLS_101$validation$pred[A:B]
+reference_101 <- Reference_101[!is.na(Reference_101)]
+Modell_101 <- lm (predicted_101 ~ reference_101)
+summary(Modell_101)
+plot(reference_101, predicted_101,xlab="Measured Cotton Content [%]", ylab="Predicted Cotton Content [%]")
+Coord <- par('usr') #xmin xmax ymin ymax
+x <- Coord[1]*1.1
+y <- Coord[4]*0.95
+y1 <- y*0.95
+y2 <- y1*0.95
+text(x,y,paste("R^2=",round(summary(Modell_101)$r.squared,4)), cex=0.8, adj=0) 
+text(x,y1,paste("Intercept=",round(summary(Modell_101)$coefficients[1],4)), cex=0.8,adj=0)
+text(x,y2,paste("Slope=",round(summary(Modell_101)$coefficients[2],4)), cex=0.8,adj=0)
+abline(lm(predicted_101 ~ reference_101),col= "black", lwd = 2)
+
+#Identify
+#identify(reference_101,predicted_101)
+
+
+###Loadingplot
+plot(PLS_101, "loadings", comps = 1:3, legendpos = "topleft",
+     labels = "numbers", xlab = "Wavenumber [1/cm]", lty = c(1,3,5), col = "black")
+abline(h = 0)
+
+x <- as.numeric(names(PLS_101$loadings[,1]))
+plot(x,
+     PLS_101$loadings[,1],
+     xlim = rev(range(x)),
+     ylim = c(-0.12,0.15),
+     lty = 1,
+     type = "l",
+     xlab = "Wavenumber [1/cm]",
+     ylab = "Loading value [-]",
+     lwd = 1)
+lines(x,
+      PLS_101$loadings[,2]+0.05,
+      lty = 3,
+      type = "l",
+      lwd = 1)
+lines(x,
+      PLS_101$loadings[,3]+0.10,
+      lty = 5,
+      type = "l",
+      lwd = 1)
+text(x = 11000, y = 0.01, 
+     labels = "Loading 1",
+     col = "black", cex = 1.2)
+text(x = 11000, y = 0.01+0.05, 
+     labels = "Loading 2",
+     col = "black", cex = 1.2)
+text(x = 11000, y = 0.01+0.10, 
+     labels = "Loading 3",
+     col = "black", cex = 1.2)
+
+
+
+
+#legend("topleft", 
+#       legend = c("Loading 1", "Loading 2", "Loading 3"), 
+#       lty = c(1, 3, 5),
+#       bty = "n")
+#Identify
+#lwz_101 <- length(Wellenzahl_101)
+#identify(Wellenzahl_101,PLS_101$loadings[1:lwz_101])
+
+
+```
+
+
+# mir_plsr
+
+```{r, fig.width=8,fig.height=4}
+###################################################
+#
+#Ausreiszer entfernen
+#Spektralen Bereich einschraenken
+#
+###################################################
+library(pls)
+library(plotly)
+library(dplyr)
+library(prospectr)
+
+
+Data_Raw <- read.csv("C:\\Users\\sebne\\Documents\\FHWN_Tulln\\DataAnalysis\\PLS_Regression\\MIR\\spectra_textiles_mir.csv",header=TRUE,sep=";",dec=",", row.names = 1)
+
+
+### assign variables
+Spectra_Original <- Data_Raw[,-c(1:2)]
+Probenbezeichnung <- rownames(Data_Raw)
+
+# Function to extract the first number from a string
+extract_number <- function(string) {
+  number <- as.numeric(sub("\\D*(\\d+).*", "\\1", string))
+  ifelse(is.na(number), 50, number)
+}
+
+# Extracting numbers from sample names
+numbers <- sapply(Probenbezeichnung, extract_number)
+numbers[numbers < 10] <- 50
+
+Reference_000 <- numbers
+###Wellenzahl erzeugen
+Wellenzahl_000 <- as.numeric(sub("X","0",names(Spectra_Original)))
+names(Spectra_Original) <- as.numeric(sub("X","0",names(Spectra_Original)))
+
+#Spektren als Matrix abspeichern
+Spectra_000 <- data.matrix(Spectra_Original) 
+#Referenzwerte definieren
+Reference_000 <- Reference_000
+#Dataframe erstellen
+Data_000 <- data.frame(Reference=I(Reference_000),Spektren=(Spectra_000))
+
+# SNV
+Spectra_100 <- standardNormalVariate(Spectra_Original)
+Reference_100 <- 100-Reference_000
+# Outlier Removal
+# 4th sample is the outlier for both here and mdatools 
+
+Spectra_101 <- Spectra_100
+Spectra_101 <- Spectra_101[-c(4),]
+
+Reference_101 <- Reference_100
+Reference_101 <- Reference_101[-c(4)]
+
+#Spektralen Bereich einschraenken
+Spectra_101[,c(1:200,610:1140,1715:1760)] <- 0
+Wellenzahl_101 <- Wellenzahl_000
+
+#Spektren als Matrix abspeichern
+Spectra_101 <- data.matrix(Spectra_101) 
+#Dataframe erstellen
+Data_101 <- data.frame(Reference=I(Reference_101),Spektren=(Spectra_101))
+
+
+# ##################################################
+# #
+# #Daten visualsieren
+# #
+# ###################################################
+# 
+# matplot(Wellenzahl_101,t(Spectra_101),lty=1,type="l",ylab="Absorbance")
+# 
+# ##################################################
+# #
+# #PLS_101 Modell erstellen
+# #
+# ###################################################
+# 
+# ### PLS Modell erstellen
+# #Algorithmus einstellen
+options(digits = 4)
+pls.options(plsalg="oscorespls")
+PLS_101 <- plsr(Reference_101 ~ Spectra_101, data=Data_101, ncomp=10, val="LOO")
+saveRDS(PLS_101,"PLS_101_MIR.RDS")
+saveRDS(reference_101,"Reference_101.RDS")
+library(pls)
+PLS_101 <- readRDS("PLS_101_MIR.RDS")
+Reference_101 <- readRDS("Reference_101.RDS")
+#############
+#
+#Ergebnisse PLS_101 Modell
+#
+#############
+
+###Zusammenfassung
+summary(PLS_101)
+
+###RMSEP
+plot(RMSEP(PLS_101), legendpos = "topright",main="RMSEP vs. Faktoren PLS_101")
+
+###Predicted vs. Measured ncomp=Anzahl der Kompnenten
+plot(PLS_101, ncomp = 5, line = TRUE,main="Predicted vs. Measured PLS_101")
+
+#Predicted vs. Measured inkl. Geradengleichung und Bestimmtheitsmasz; Faktor eingeben und ausfuehren
+Faktor <- 10
+
+YY <- length(Reference_101[!is.na(Reference_101)])
+B <- Faktor*YY
+A <- (B-YY)+1  
+predicted_101 <- PLS_101$validation$pred[A:B]
+reference_101 <- Reference_101[!is.na(Reference_101)]
+Modell_101 <- lm (predicted_101 ~ reference_101)
+summary(Modell_101)
+plot(reference_101, predicted_101,xlab="Measured Cotton Content [%]", ylab="Predicted Cotton Content [%]")
+Coord <- par('usr') #xmin xmax ymin ymax
+x <- Coord[1]*1.1
+y <- Coord[4]*0.95
+y1 <- y*0.95
+y2 <- y1*0.95
+text(x,y,paste("R^2=",round(summary(Modell_101)$r.squared,4)), cex=0.8, adj=0) 
+text(x,y1,paste("Intercept=",round(summary(Modell_101)$coefficients[1],4)), cex=0.8,adj=0)
+text(x,y2,paste("Slope=",round(summary(Modell_101)$coefficients[2],4)), cex=0.8,adj=0)
+abline(lm(predicted_101 ~ reference_101),col= "black", lwd = 2)
+
+#Identify
+#identify(reference_101,predicted_101)
+
+
+###Loadingplot
+plot(PLS_101, "loadings", comps = 1:3, legendpos = "topleft",
+     labels = "numbers", xlab = "Wavenumber [1/cm]", lty = c(1,3,5), col = "black")
+abline(h = 0)
+
+x <- as.numeric(names(PLS_101$loadings[,1]))
+plot(x,
+     PLS_101$loadings[,1],
+     xlim = rev(range(x)),
+     ylim = c(-0.10,0.25),
+     lty = 1,
+     type = "l",
+     xlab = "Wavenumber [1/cm]",
+     ylab = "Loading value [-]",
+     lwd = 1)
+lines(x,
+      PLS_101$loadings[,2]+0.05,
+      lty = 3,
+      type = "l",
+      lwd = 1)
+lines(x,
+      PLS_101$loadings[,3]+0.10,
+      lty = 5,
+      type = "l",
+      lwd = 1)
+text(x = 2400, y = 0.01, 
+     labels = "Loading 1",
+     col = "black", cex = 1.2)
+text(x = 2400, y = 0.01+0.05, 
+     labels = "Loading 2",
+     col = "black", cex = 1.2)
+text(x = 2400, y = 0.01+0.10, 
+     labels = "Loading 3",
+     col = "black", cex = 1.2)
+
+
+
+
+#legend("topleft", 
+#       legend = c("Loading 1", "Loading 2", "Loading 3"), 
+#       lty = c(1, 3, 5),
+#       bty = "n")
+#Identify
+#lwz_101 <- length(Wellenzahl_101)
+#identify(Wellenzahl_101,PLS_101$loadings[1:lwz_101])
+
+
+```
+
+# mir_mdatools
+```{r, fig.width=8,fig.height=4}
+###################################################
+#
+#Ausreiszer entfernen
+#Spektralen Bereich einschraenken
+#
+###################################################
+# library(mdatools)
+# 
+# # #Ausreiszer entfernen
+# # 4th sample is the outlier for both here and mdatools 
+# Spectra_mda <- Spectra_000
+# Spectra_mda <- Spectra_mda[-c(4),]
+# 
+# Reference_mda <- Reference_100
+# Reference_mda <- Reference_mda[-c(4)]
+# 
+# #Spektralen Bereich einschraenken
+# Spectra_mda[,c(1:200,610:1140,1715:1760)] <- 0
+# Wellenzahl_101 <- Wellenzahl_000
+# 
+# #Spektren als Matrix abspeichern
+# Spectra_mda <- data.matrix(Spectra_mda) 
+# #Dataframe erstellen
+# Data_101 <- data.frame(Reference=I(Reference_mda),Spektren=(Spectra_mda))
+# 
+# myprep <- list(
+#   prep("snv")
+#   #prep("msc"),
+#   #prep("alsbasecorr", list(plambda = 5, p = 2, max.niter = 1))
+# )
+# 
+# preprocessing <- function(originalspectra, prep_set) {
+# attr(originalspectra, "xaxis.values") = as.numeric(colnames(originalspectra))
+# attr(originalspectra, "xaxis.name") = "Wavenumber"
+# 
+# # apply combined methods
+# pspectra <- employ.prep(prep_set, originalspectra)
+# 
+# par(mfrow = c(2, 1))
+# mdaplot(originalspectra, type = "l", main = "Original")
+# mdaplot(pspectra, type = "l", main = "after treatment")
+# return(pspectra)
+# }
+# pspectra <- preprocessing(Spectra_000,myprep)
+# 
+# #Procrustes cross-validation
+# library(pcv)
+# Xpv = pcvpls(pspectra, Reference_000, 20, cv = list("ven", 10))
+# pls_model_pcv = pls(pspectra, Reference_000, 10, x.test = Xpv, y.test = Reference_000)
+# 
+# #LOO cross-validation
+# pls_model_loo = pls(pspectra, Reference_000, 10, scale = TRUE, cv = 1, lim.type = "ddrobust")
+# 
+# 
+# saveRDS(pls_model_pcv,"PLS_MIR_PCV.RDS")
+# saveRDS(pls_model_loo,"PLS_MIR_LOO.RDS")
+
+#saveRDS(Reference_mda,"Reference_101.RDS")
+
+pls_model_pcv <- readRDS("PLS_MIR_PCV.RDS")
+pls_model_loo <- readRDS("PLS_MIR_LOO.RDS")
+
+###Zusammenfassung
+library(mdatools)
+
+summary(pls_model_pcv)
+summary(pls_model_loo)
+
+par(mfrow = c(1, 2))
+plotRMSE(pls_model_pcv)
+plotPredictions(pls_model_pcv)
+plotXYScores(pls_model_pcv)
+
+par(mfrow = c(1, 2))
+plotRMSE(pls_model_loo)
+plotRMSERatio(pls_model_loo)
+plotPredictions(pls_model_loo)
+plotXYScores(pls_model_loo)
+
+############comparison
+library(plotly)
+
+fig <- plot_ly(
+  type = 'table',
+  header = list(
+    values = c("<b>Cars</b>", names(mtcars)),
+  align = c('left', rep('center', ncol(mtcars))),
+  line = list(width = 1, color = 'black'),
+  fill = list(color = 'rgb(235, 100, 230)'),
+  font = list(family = "Arial", size = 14, color = "white")
+  ),
+  cells = list(
+    values = rbind(
+      rownames(mtcars), 
+      t(as.matrix(unname(mtcars)))
+    ),
+    align = c('left', rep('center', ncol(mtcars))),
+    line = list(color = "black", width = 1),
+    fill = list(color = c('rgb(235, 193, 238)', 'rgba(228, 222, 249, 0.65)')),
+    font = list(family = "Arial", size = 12, color = c("black"))
+  ))
+
+fig
+
+```
