@@ -12,7 +12,9 @@ library(dplyr)
 
 ###Daten laden
 
-Data_Raw <- read.csv("C:\\Users\\sebne\\Documents\\FHWN_Tulln\\DataAnalysis\\DataAnalysis\\JAF\\JAF\\spectra_mir.csv",header=TRUE,sep=",",dec=".")
+setwd("/Users/andi/Documents/Coding/spectroscopy")
+
+Data_Raw <- read.csv("spectra_textiles_mir.csv", header = FALSE, sep = ",", dec = ".")
 
 ### assign variables
 Spectra_Original <- Data_Raw[,-1]
