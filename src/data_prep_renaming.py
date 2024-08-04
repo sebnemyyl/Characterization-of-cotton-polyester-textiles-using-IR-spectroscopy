@@ -4,23 +4,28 @@ import os
 
 print("Renaming starts")
 
-my_path = "examples/extra/MIR"
+my_path = "../input/clean_txt/NIR_raw/240417_nir"
 
 def clean_up_desc(desc_with_suffix):
     desc = desc_with_suffix.split(".", 1)[0]
     desc = desc.replace("-", "")
-    desc = desc.replace("_", "")
+    print(desc)
+    desc = desc.replace("petcotton", "specimen3")
+    desc = desc.replace("spot", "area0_spot")
+    desc = desc.replace("_0", "")
+    print(desc)
+    #desc = desc.replace("_", "")
     return desc
 
 def create_new_file_name(cotton_content, desc):
     polyester_content = 100 - int(cotton_content)
     # extra marker, so that there are no overlaps 
-    date = "240613"
+    date = "240417"
     new_name = "s_" + str(cotton_content) + "_" + str(polyester_content) + "_" + desc + "_" + date + ".txt"
     return new_name
 
 def starts_with_prefix(file):
-    return file.startswith("nir") or file.startswith("mir")
+    return file.startswith("vartest") or file.startswith("mir")
 
 # r=root, d=directories, f = files
 for r, d, f in os.walk(my_path):
@@ -47,4 +52,4 @@ for r, d, f in os.walk(my_path):
             old_file = os.path.join(my_path, file)
             new_file = os.path.join(my_path, new_name)
             print(f"{file} will be renamed to {new_name}")
-            #os.rename(old_file, new_file)
+            os.rename(old_file, new_file)
