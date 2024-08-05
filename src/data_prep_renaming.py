@@ -17,11 +17,11 @@ def clean_up_desc(desc_with_suffix):
     #desc = desc.replace("_", "")
     return desc
 
-def create_new_file_name(cotton_content, desc):
-    polyester_content = 100 - int(cotton_content)
+def create_new_file_name(polyester_content, desc):
+    cotton_content = 100 - int(polyester_content)
     # extra marker, so that there are no overlaps 
     date = "240417"
-    new_name = "s_" + str(cotton_content) + "_" + str(polyester_content) + "_" + desc + "_" + date + ".txt"
+    new_name = "s_" + str(polyester_content) + "_" + str(cotton_content) + "_" + desc + "_" + date + ".txt"
     return new_name
 
 def starts_with_prefix(file):
@@ -37,18 +37,19 @@ for r, d, f in os.walk(my_path):
                 else:
                     file_name = file
                 splitted_name = file_name.split("-", 1)
-                cotton_content = splitted_name[0]
-                # We just look for the description, we ignore polyester content
+                polyester_content = splitted_name[0]
+                # We just look for the description, we ignore cotton content
                 desc_with_suffix = splitted_name[1].split("_", 1)[1]
                 desc = clean_up_desc(desc_with_suffix)
-                if "_" in cotton_content:
-                    cotton_content = cotton_content.split("_")[0]
-                    cotton_content = int(cotton_content) + 1
-                new_name = create_new_file_name(cotton_content, desc)
+                # We round up when there is a decimal
+                if "_" in polyester_content:
+                    polyester_content = polyester_content.split("_")[0]
+                    polyester_content = int(polyester_content) + 1
+                new_name = create_new_file_name(polyester_content, desc)
             else:
-                cotton_content = 50
+                polyester_content = 50
                 desc = clean_up_desc(file)
-                new_name = create_new_file_name(cotton_content, desc)
+                new_name = create_new_file_name(polyester_content, desc)
             old_file = os.path.join(my_path, file)
             new_file = os.path.join(my_path, new_name)
             print(f"{file} will be renamed to {new_name}")

@@ -9,8 +9,8 @@
 #### use Converter-FolderFiles.mtb file and anleitung N:\Spektroskopie\Geräte\RAMAN\Bedienung\ExportOpus_alsTxt.file_V001.docx
 #### to convert OPUS files to several TXT files
 
-load_txt_files <- function(data, dir) {
-  path <- file.path(dir, data)
+load_txt_files <- function(file_name, dir) {
+  path <- file.path(dir, file_name)
   df <- try(read.csv(path, header = FALSE, sep = ",", dec = "."))
   return(df)
 }
@@ -50,7 +50,7 @@ convert_txt_to_dataframe <- function(dir) {
   rownames(spectra) <- lapply(file_paths, basename)
   # Extracting features/meta data from the file name
   features <- lapply(file_paths, split_file_name)
-  spectra$pet <- sapply(features, `[[`, 2) #TODO could be cotton instead
+  spectra$pet <- sapply(features, `[[`, 2)
   spectra$cotton <- sapply(features, `[[`, 3)
   spectra$specimen <- extract_number(features, 4)
   spectra$area <- extract_number(features, 5)
