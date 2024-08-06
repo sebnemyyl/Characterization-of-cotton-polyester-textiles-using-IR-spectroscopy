@@ -59,6 +59,6 @@ convert_txt_to_dataframe <- function(dir) {
   return(spectra)
 }
 
-spectra <- convert_txt_to_dataframe(dir = "input/clean_txt/NIR")
+spectra <- convert_txt_to_dataframe(dir = "../input/clean_txt/MIR")
 #write to csv file
-write.csv2(spectra, "spectra_nir_240523.csv", row.names = TRUE)
+write.csv2(spectra, "spectra_mir_240806.csv", row.names = TRUE)

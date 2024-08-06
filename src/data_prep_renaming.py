@@ -4,14 +4,15 @@ import os
 
 print("Renaming starts")
 
-my_path = "../input/clean_txt/NIR_raw/240417_nir"
+my_path = "../input/clean_txt/MIR/240806_mir"
 
 def clean_up_desc(desc_with_suffix):
     desc = desc_with_suffix.split(".", 1)[0]
     desc = desc.replace("-", "")
     print(desc)
-    desc = desc.replace("petcotton", "specimen3")
-    desc = desc.replace("spot", "area0_spot")
+    desc = desc.replace("sample", "specimen")
+    desc = desc.replace("q", "area")
+    desc = desc.replace("petcotton_", "")
     desc = desc.replace("_0", "")
     print(desc)
     #desc = desc.replace("_", "")
@@ -20,7 +21,7 @@ def clean_up_desc(desc_with_suffix):
 def create_new_file_name(polyester_content, desc):
     cotton_content = 100 - int(polyester_content)
     # extra marker, so that there are no overlaps 
-    date = "240417"
+    date = "240806"
     new_name = "s_" + str(polyester_content) + "_" + str(cotton_content) + "_" + desc + "_" + date + ".txt"
     return new_name
 
