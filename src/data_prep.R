@@ -1,18 +1,42 @@
-# Function to extract pet content from sample name
-extract_cotton_content <- function(sample_file_name) {
-  splitted <- strsplit(sample_file_name, "_")
-  pet_content <- as.numeric(splitted[[1]][[3]])
-  pet_content
+library(pls)
+library(plotly)
+library(dplyr)
+library(prospectr)
+
+load_csv <- function(csv_path) {
+  # Load CSV file
+  csv_raw <- read.csv(csv_path, header = TRUE, sep = ";", dec = ",", row.names = 1)
+  # Extract spectra and features
+  spectra_raw <- csv_raw[, -c(1763:1768)]
+  features <- csv_raw[, c(1763:1768)]
+  # Fix wave number naming
+  names(spectra_raw) <- as.numeric(sub("X", "0", names(spectra_raw)))
+  # Convert spectra to matrix
+  spectra_matrix <- data.matrix(spectra_raw)
+  # Create data frame (full spectral area and with outliers)
+  spectra_df <- data.frame(reference = features, spectra = spectra_matrix)
+  return(spectra_df)
 }
 
-### Create spectra dataframe with labeled columns (wave numbers) and rows (sample names)
-load_spectra <- function(file_path) {
-  spectra <- read.csv(file_path, header = TRUE, row.names = 1, sep = ";", dec = ".")
-  sample_file_names <- rownames(spectra)
-  sample_info <- sapply(sample_file_names, extract_cotton_content)
-  spectra$cotton_content <- sample_info
-  spectra
+clean_up_spectra <- function(spectra_df) {
+  reference <- spectra_df %>% select(starts_with("reference"))
+  spectra <- spectra_df %>% select(starts_with("spectra"))
+  # SNV
+  spectra <- standardNormalVariate(spectra)
+  # Outlier Removal
+  # 4th sample is the outlier for both here and mdatools (???)
+  spectra <- spectra[-c(4), ]
+  reference <- reference[-c(4), ]
+  # Spektralen Bereich einschraenken
+  spectra[, c(1:200, 610:1140, 1715:1760)] <- 0
+  # Recreate data frame
+  clean_df <- data.frame(reference, spectra)
+  return(clean_df)
 }
 
 setwd(".")
-spectra <- load_spectra("input/spectra_textiles_mir.csv")
+csv_path <- "input/spectra_mir_240806.csv"
+spectra_df_full <- load_csv(csv_path)
+spectra_df_clean <- clean_up_spectra(spectra_df_full)
+print(spectra_df_clean[20])
+print(spectra_df_full[20])
