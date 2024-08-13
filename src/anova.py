@@ -4,9 +4,9 @@ import numpy as np
 from scipy.signal import find_peaks
 
 # Load the data
-data = pd.read_csv('input/spectra_nir_240807.csv', sep=';', header=0)
+data = pd.read_csv('input/spectra_nir_240812.csv', sep=';', header=0)
 
-related_data = data[(data['pet'] == 50) & (data['measuring_date'] == 240807)]
+related_data = data[(data['pet'] == 50) & (data['measuring_date'] >= 240807) & (data['specimen'].isin([8,9,10]))]
 related_data = related_data.drop(['pet', 'cotton','area','spot','measuring_date','Unnamed: 0'], axis=1)
 
 data_anova = related_data.replace(',', '.', regex=True)
@@ -31,7 +31,7 @@ mean_spectrum = snv_transformed_df.mean(axis=0)
 
 
 # Find peaks in the mean spectrum
-peaks, _ = find_peaks(mean_spectrum, height=-0.695)  # Adjust height based on your data
+peaks, _ = find_peaks(mean_spectrum, height=1)  # Adjust height based on your data
 key_wavenumbers = snv_transformed_df.columns[peaks].astype(str).tolist()
 
 print("Key Wavenumbers for ANOVA analysis: ", key_wavenumbers)
