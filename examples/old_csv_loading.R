@@ -63,3 +63,7 @@ options(digits = 4)
 pls.options(plsalg="oscorespls")
 PLS_101 <- plsr(Reference_101 ~ Spectra_101, data=Data_101, ncomp=10, val="LOO")
 summary(PLS_101)
+
+plot(PLS_101, "loadings", comps = 1:3, legendpos = "topleft",
+     labels = "numbers", xlab = "Wavenumber [1/cm]", lty = c(1,3,5), col = "black")
+abline(h = 0)

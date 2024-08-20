@@ -43,6 +43,7 @@ run_pls <- function(spectra_df, rds_path) {
   pls.options(plsalg = "oscorespls")
   ref_cotton <- spectra_df$reference.cotton
   spectra <- spectra_df_clean %>% select(starts_with("spectra"))
+  names(spectra) <- as.numeric(sub("spectra.", "", names(spectra)))
   spectra_matrix <- data.matrix(spectra)
   pls_result <- plsr(ref_cotton ~ spectra_matrix, data = spectra_df, ncomp = 10, val = "LOO")
   if (!missing(rds_path)) {
@@ -66,11 +67,11 @@ plot_pls <- function(pls) {
 
 TEMP_DIR <- "temp"
 setwd(".")
-csv_path <- "input/spectra_nir_240812.csv"
+csv_path <- "input/spectra_mir_240806.csv"
 spectra_df_full <- load_csv(csv_path)
 spectra_df_clean <- clean_up_spectra(spectra_df_full)
 #plot_spectra(spectra_df_clean)
 pls_rds_path <- file.path(TEMP_DIR, "pls.RDS")
 pls <- run_pls(spectra_df_clean, pls_rds_path)
-#pls <- readRDS(pls_rds_path)
+pls <- readRDS(pls_rds_path)
 plot_pls(pls)
