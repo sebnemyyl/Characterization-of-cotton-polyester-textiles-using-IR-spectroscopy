@@ -76,7 +76,8 @@ plot_predicted_vs_measured <- function(pls, spectra_df) {
   model <- lm(predicted ~ ref_cotton)
   print(summary(model))
   plot(ref_cotton, predicted,
-       xlab = "Measured Cotton Content [%]", ylab = "Predicted Cotton Content [%]")
+       xlab = "Measured Cotton Content [%]", ylab = "Predicted Cotton Content [%]",
+       main = "Predicted Linear Model")
   abline(model, col = "black", lwd = 2)
 }
 
@@ -117,16 +118,49 @@ plot_loading <- function(pls) {
        col = "black", cex = 1.2)
 }
 
+#myprep <- list(prep("snv"))
+
+# TODO doesnt work yet
+preprocessing <- function(originalspectra, prep_set) {
+  print("Hello world!")
+  attr(originalspectra, "xaxis.values") <- as.numeric(colnames(originalspectra))
+  attr(originalspectra, "xaxis.name") <- "Wavenumber"
+
+  # apply combined methods
+  pspectra <- employ.prep(prep_set, originalspectra)
+  print("What aup!!")
+
+  #par(mfrow = c(2, 1))
+  mdaplot(originalspectra, type = "l", main = "Original")
+  #mdaplot(pspectra, type = "l", main = "after treatment")
+  return(pspectra)
+}
+
+# TODO doesnt work yet
+run_mda <- function(spectra_df) {
+  ref_cotton <- spectra_df$reference.cotton
+  Xpv <- pcvpls(spectra_df, ref_cotton, 20, cv = list("ven", 10))
+  pls_model_pcv <- pls(spectra_df, ref_cotton, 10, x.test = Xpv, y.test = ref_cotton)
+  summary(pls_model_pcv)
+}
+
+
+library(pcv)
+library(mdatools)
+
+par(mfrow = c(1, 1))
+
 TEMP_DIR <- "temp"
 setwd(".")
 csv_path <- "input/spectra_mir_240806.csv"
 spectra_df_full <- load_csv(csv_path)
 spectra_df_clean <- clean_up_spectra(spectra_df_full)
-#plot_spectra(spectra_df_clean)
+plot_spectra(spectra_df_clean)
 
 pls_rds_path <- file.path(TEMP_DIR, "pls.RDS")
 #pls <- run_pls(spectra_df_clean, pls_rds_path)
 pls <- readRDS(pls_rds_path)
-#plot_pls(pls)
+
+plot_pls(pls)
 #plot_predicted_vs_measured(pls, spectra_df_clean)
-plot_loading(pls)
+#plot_loading(pls)
