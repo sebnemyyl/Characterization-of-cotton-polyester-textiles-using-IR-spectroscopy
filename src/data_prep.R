@@ -64,10 +64,6 @@ plot_pls <- function(pls) {
   plot(RMSEP(pls), legendpos = "topright", main = "RMSEP vs. Factors PLS")
 
   plot(pls, ncomp = 5, line = TRUE, main = "Predicted vs. Measured PLS")
-
-  plot(pls, "loadings", comps = 1:3, legendpos = "topleft",
-       labels = "numbers", xlab = "Wavenumber [1/cm]", lty = c(1, 3, 5), col = "black")
-  abline(h = 0)
 }
 
 plot_predicted_vs_measured <- function(pls, spectra_df) {
@@ -84,6 +80,43 @@ plot_predicted_vs_measured <- function(pls, spectra_df) {
   abline(model, col = "black", lwd = 2)
 }
 
+plot_loading <- function(pls) {
+  plot(pls, "loadings", comps = 1:3, legendpos = "topleft",
+       labels = "numbers", xlab = "Wavenumber [1/cm]", lty = c(1, 3, 5), col = "black")
+  abline(h = 0)
+
+  loadings <- pls$loadings
+  x <- as.numeric(names(loadings[, 1]))
+  plot(x,
+       loadings[, 1],
+       xlim = rev(range(x)),
+       ylim = c(-0.10, 0.25),
+       lty = 1,
+       type = "l",
+       xlab = "Wavenumber [1/cm]",
+       ylab = "Loading value [-]",
+       lwd = 1)
+  lines(x,
+        loadings[, 2] + 0.05,
+        lty = 3,
+        type = "l",
+        lwd = 1)
+  lines(x,
+        loadings[, 3] + 0.10,
+        lty = 5,
+        type = "l",
+        lwd = 1)
+  text(x = 2400, y = 0.01,
+       labels = "Loading 1",
+       col = "black", cex = 1.2)
+  text(x = 2400, y = 0.01 + 0.05,
+       labels = "Loading 2",
+       col = "black", cex = 1.2)
+  text(x = 2400, y = 0.01 + 0.10,
+       labels = "Loading 3",
+       col = "black", cex = 1.2)
+}
+
 TEMP_DIR <- "temp"
 setwd(".")
 csv_path <- "input/spectra_mir_240806.csv"
@@ -94,5 +127,6 @@ spectra_df_clean <- clean_up_spectra(spectra_df_full)
 pls_rds_path <- file.path(TEMP_DIR, "pls.RDS")
 #pls <- run_pls(spectra_df_clean, pls_rds_path)
 pls <- readRDS(pls_rds_path)
-plot_predicted_vs_measured(pls, spectra_df_clean)
 #plot_pls(pls)
+#plot_predicted_vs_measured(pls, spectra_df_clean)
+plot_loading(pls)

@@ -68,22 +68,33 @@ PLS_101 <- plsr(Reference_101 ~ Spectra_101, data=Data_101, ncomp=10, val="LOO")
 #      labels = "numbers", xlab = "Wavenumber [1/cm]", lty = c(1,3,5), col = "black")
 # abline(h = 0)
 
-Faktor <- 10
 
-YY <- length(Reference_101[!is.na(Reference_101)])
-B <- Faktor*YY
-A <- (B-YY)+1  
-predicted_101 <- PLS_101$validation$pred[A:B]
-reference_101 <- Reference_101[!is.na(Reference_101)]
-Modell_101 <- lm (predicted_101 ~ reference_101)
-summary(Modell_101)
-plot(reference_101, predicted_101,xlab="Measured Cotton Content [%]", ylab="Predicted Cotton Content [%]")
-Coord <- par('usr') #xmin xmax ymin ymax
-x <- Coord[1]*1.1
-y <- Coord[4]*0.95
-y1 <- y*0.95
-y2 <- y1*0.95
-text(x,y,paste("R^2=",round(summary(Modell_101)$r.squared,4)), cex=0.8, adj=0) 
-text(x,y1,paste("Intercept=",round(summary(Modell_101)$coefficients[1],4)), cex=0.8,adj=0)
-text(x,y2,paste("Slope=",round(summary(Modell_101)$coefficients[2],4)), cex=0.8,adj=0)
-abline(lm(predicted_101 ~ reference_101),col= "black", lwd = 2)
+x <- as.numeric(names(PLS_101$loadings[,1]))
+plot(x,
+     PLS_101$loadings[,1],
+     xlim = rev(range(x)),
+     ylim = c(-0.10,0.25),
+     lty = 1,
+     type = "l",
+     xlab = "Wavenumber [1/cm]",
+     ylab = "Loading value [-]",
+     lwd = 1)
+lines(x,
+      PLS_101$loadings[,2]+0.05,
+      lty = 3,
+      type = "l",
+      lwd = 1)
+lines(x,
+      PLS_101$loadings[,3]+0.10,
+      lty = 5,
+      type = "l",
+      lwd = 1)
+text(x = 2400, y = 0.01, 
+     labels = "Loading 1",
+     col = "black", cex = 1.2)
+text(x = 2400, y = 0.01+0.05, 
+     labels = "Loading 2",
+     col = "black", cex = 1.2)
+text(x = 2400, y = 0.01+0.10, 
+     labels = "Loading 3",
+     col = "black", cex = 1.2)
