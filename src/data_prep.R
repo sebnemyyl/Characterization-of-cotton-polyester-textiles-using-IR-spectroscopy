@@ -60,9 +60,28 @@ plot_spectra <- function(spectra_df) {
 
 plot_pls <- function(pls) {
   summary(pls)
+
   plot(RMSEP(pls), legendpos = "topright", main = "RMSEP vs. Factors PLS")
+
+  plot(pls, ncomp = 5, line = TRUE, main = "Predicted vs. Measured PLS")
+
   plot(pls, "loadings", comps = 1:3, legendpos = "topleft",
        labels = "numbers", xlab = "Wavenumber [1/cm]", lty = c(1, 3, 5), col = "black")
+  abline(h = 0)
+}
+
+plot_predicted_vs_measured <- function(pls, spectra_df) {
+  factor <- 10
+  ref_cotton <- spectra_df$reference.cotton
+  len <- length(ref_cotton)
+  end <- factor * len
+  start <- (end - len) + 1
+  predicted <- pls$validation$pred[start:end]
+  model <- lm(predicted ~ ref_cotton)
+  print(summary(model))
+  plot(ref_cotton, predicted,
+       xlab = "Measured Cotton Content [%]", ylab = "Predicted Cotton Content [%]")
+  abline(model, col = "black", lwd = 2)
 }
 
 TEMP_DIR <- "temp"
@@ -71,7 +90,9 @@ csv_path <- "input/spectra_mir_240806.csv"
 spectra_df_full <- load_csv(csv_path)
 spectra_df_clean <- clean_up_spectra(spectra_df_full)
 #plot_spectra(spectra_df_clean)
+
 pls_rds_path <- file.path(TEMP_DIR, "pls.RDS")
-pls <- run_pls(spectra_df_clean, pls_rds_path)
+#pls <- run_pls(spectra_df_clean, pls_rds_path)
 pls <- readRDS(pls_rds_path)
-plot_pls(pls)
+plot_predicted_vs_measured(pls, spectra_df_clean)
+#plot_pls(pls)
