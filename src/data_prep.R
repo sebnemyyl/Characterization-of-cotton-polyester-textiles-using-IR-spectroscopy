@@ -1,7 +1,11 @@
+#TODO improve this, make configurable
+setwd("C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo")
+
 library(pls)
 library(plotly)
 library(dplyr)
 library(prospectr)
+source("src/baseline_correction.R")
 
 load_csv <- function(csv_path) {
   # Load CSV file
@@ -21,12 +25,8 @@ load_csv <- function(csv_path) {
 }
 
 clean_up_spectra <- function(spectra_df) {
-  reference <- spectra_df %>% select(starts_with("reference"))
-  spectra <- spectra_df %>% select(starts_with("spectra"))
-  # SNV
-  # TODO make SNV configurable
-  spectra <- standardNormalVariate(spectra)
-  # Outlier Removal (4th sample is the outlier for here and mdatools)
+  reference <- spectra_df %>% dplyr::select(starts_with("reference"))
+  spectra <- spectra_df %>% dplyr::select(starts_with("spectra"))
   # TODO check what this 4th sample means.. -> Extract function and make it configurable
   spectra <- spectra[-c(4), ]
   reference <- reference[-c(4), ]
@@ -38,11 +38,12 @@ clean_up_spectra <- function(spectra_df) {
   return(clean_df)
 }
 
+
 run_pls <- function(spectra_df, rds_path) {
   options(digits = 4)
   pls.options(plsalg = "oscorespls")
   ref_cotton <- spectra_df$reference.cotton
-  spectra <- spectra_df_clean %>% select(starts_with("spectra"))
+  spectra <- spectra_df_clean %>% dplyr::select(starts_with("spectra"))
   names(spectra) <- as.numeric(sub("spectra.", "", names(spectra)))
   spectra_matrix <- data.matrix(spectra)
   pls_result <- plsr(ref_cotton ~ spectra_matrix, data = spectra_df, ncomp = 10, val = "LOO")
@@ -53,7 +54,7 @@ run_pls <- function(spectra_df, rds_path) {
 }
 
 plot_spectra <- function(spectra_df) {
-  spectra <- spectra_df %>% select(starts_with("spectra"))
+  spectra <- spectra_df %>% dplyr::select(starts_with("spectra"))
   wave_numbers <- as.integer(sub("spectra.", "", names(spectra)))
   matplot(wave_numbers, t(spectra), lty = 1, type = "l", ylab = "Absorbance")
 }
@@ -151,16 +152,20 @@ library(mdatools)
 par(mfrow = c(1, 1))
 
 TEMP_DIR <- "temp"
-setwd(".")
 csv_path <- "input/spectra_mir_240806.csv"
 spectra_df_full <- load_csv(csv_path)
 spectra_df_clean <- clean_up_spectra(spectra_df_full)
-plot_spectra(spectra_df_clean)
+#plot_spectra(spectra_df_clean)
+baseline_correction_df <- stdnormalvariate(spectra_df_clean)
+#plot_spectra(baseline_correction_df)
+
+spectra_rds_path <- file.path(TEMP_DIR, "spectra_treated.RDS")
+saveRDS(baseline_correction_df, spectra_rds_path)
 
 pls_rds_path <- file.path(TEMP_DIR, "pls.RDS")
 #pls <- run_pls(spectra_df_clean, pls_rds_path)
-pls <- readRDS(pls_rds_path)
+#pls <- readRDS(pls_rds_path)
 
-plot_pls(pls)
+#plot_pls(pls)
 #plot_predicted_vs_measured(pls, spectra_df_clean)
 #plot_loading(pls)
