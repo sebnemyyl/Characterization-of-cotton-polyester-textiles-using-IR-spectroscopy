@@ -1,42 +1,12 @@
 #TODO improve this, make configurable
-setwd("C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo")
+#setwd("C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo")
+setwd(".")
 
 library(pls)
 library(plotly)
 library(dplyr)
-library(prospectr)
-source("src/baseline_correction.R")
-
-load_csv <- function(csv_path) {
-  # Load CSV file
-  csv_raw <- read.csv(csv_path, header = TRUE, sep = ";", dec = ",", row.names = 1)
-  # Extract spectra and features
-  feature_names <- c("pet", "cotton", "specimen", "area", "spot", "measuring_date")
-  feature_col <- which(names(csv_raw) %in% feature_names)
-  spectra_raw <- csv_raw[, -feature_col]
-  features <- csv_raw[, feature_col]
-  # Fix wave number naming
-  names(spectra_raw) <- as.numeric(sub("X", "0", names(spectra_raw)))
-  # Convert spectra to matrix
-  spectra_matrix <- data.matrix(spectra_raw)
-  # Create data frame (full spectral area and with outliers)
-  spectra_df <- data.frame(reference = features, spectra = spectra_matrix)
-  return(spectra_df)
-}
-
-clean_up_spectra <- function(spectra_df) {
-  reference <- spectra_df %>% dplyr::select(starts_with("reference"))
-  spectra <- spectra_df %>% dplyr::select(starts_with("spectra"))
-  # TODO check what this 4th sample means.. -> Extract function and make it configurable
-  spectra <- spectra[-c(4), ]
-  reference <- reference[-c(4), ]
-  # Limit spectral area
-  # TODO make it configurable for NIR
-  spectra[, c(1:200, 610:1140, 1715:1762)] <- 0
-  # Recreate data frame
-  clean_df <- data.frame(reference, spectra)
-  return(clean_df)
-}
+#source("src/baseline_correction.R")
+source("src/util/02_data_prep_load_CSV.R")
 
 
 run_pls <- function(spectra_df, rds_path) {
@@ -155,12 +125,12 @@ TEMP_DIR <- "temp"
 csv_path <- "input/spectra_mir_240806.csv"
 spectra_df_full <- load_csv(csv_path)
 spectra_df_clean <- clean_up_spectra(spectra_df_full)
-#plot_spectra(spectra_df_clean)
-baseline_correction_df <- stdnormalvariate(spectra_df_clean)
+plot_spectra(spectra_df_clean)
+#baseline_correction_df <- stdnormalvariate(spectra_df_clean)
 #plot_spectra(baseline_correction_df)
 
 spectra_rds_path <- file.path(TEMP_DIR, "spectra_treated.RDS")
-saveRDS(baseline_correction_df, spectra_rds_path)
+#saveRDS(baseline_correction_df, spectra_rds_path)
 
 pls_rds_path <- file.path(TEMP_DIR, "pls.RDS")
 #pls <- run_pls(spectra_df_clean, pls_rds_path)

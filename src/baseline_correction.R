@@ -1,7 +1,7 @@
 # Load packages
 Packages <- c("plyr","dplyr","IDPmisc","prospectr","dendextend","baseline",
               "pls","plotrix","knitr","ggplot2","gridExtra","ggpubr","ggpmisc",
-              "ChemoSpec", "matrixStats", "stringr", "MASS", "caret", 
+              "ChemoSpec", "matrixStats", "stringr", "caret", 
               "ROCR", "binom", "cvAUC","reshape2")
 
 for (p in Packages) {
