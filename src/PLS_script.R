@@ -1,4 +1,4 @@
-#TODO improve this, make configurable
+# Before running script always set the work directory to top-level of the repository.
 #setwd("C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo")
 setwd(".")
 
