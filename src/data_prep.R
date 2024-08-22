@@ -5,8 +5,10 @@ setwd(".")
 library(pls)
 library(plotly)
 library(dplyr)
-#source("src/baseline_correction.R")
 source("src/util/02_data_prep_load_CSV.R")
+source("src/util/03_data_prep_limit_spectra.R")
+#source("src/util/04_data_prep_baseline_correction.R")
+source("src/util/05_plot_spectra.R")
 
 
 run_pls <- function(spectra_df, rds_path) {
@@ -23,11 +25,6 @@ run_pls <- function(spectra_df, rds_path) {
   return(pls_result)
 }
 
-plot_spectra <- function(spectra_df) {
-  spectra <- spectra_df %>% dplyr::select(starts_with("spectra"))
-  wave_numbers <- as.integer(sub("spectra.", "", names(spectra)))
-  matplot(wave_numbers, t(spectra), lty = 1, type = "l", ylab = "Absorbance")
-}
 
 plot_pls <- function(pls) {
   summary(pls)
