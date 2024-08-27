@@ -30,29 +30,29 @@ detrend <- function(spectra_df, polynomial_order) {
 
 
 # Asymmetric Least Squares
-als <- function(spectra_df, lambda, p , maxit) {
+als <- function(spectra_df, lambda_als = 3, p_als = 0.05, maxit_als = 20) {
   spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
   reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
   spectra_als <- baseline.als(spectra = spectra_matrix, 
-                        lambda = 3,         # 2nd derivative constraint
-                        p = 0.05,           # Weighting of positive residuals
-                        maxit = 20)         # Maximum number of iterations
-  als_df <- data.frame(reference_matrix, spectra_als)
+                        lambda = lambda_als,         # 2nd derivative constraint
+                        p = p_als,           # Weighting of positive residuals
+                        maxit = maxit_als)         # Maximum number of iterations
+  als_df <- data.frame(reference_matrix, spectra_als$corrected)
   colnames(als_df) <- colnames(spectra_df)
   return(als_df)
 }
 
 
 # FillPeaks                                                          
-fillpeaks <- function(spectra_df, lambda, hwi , it, int) {
+fillpeaks <- function(spectra_df, lambda_fp = 1, hwi_fp = 10 , it_fp = 6, int_fp = 400) {
   spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
   reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
   spectra_fillpeaks <- baseline.fillPeaks(spectra = spectra_matrix, 
-                        lambda=1,        # 2nd derivative penalty for primary smoothing
-                        hwi=10,           # Half width of local windows
-                        it=6,            # Number of iterations in suppression loop
-                        int=400)         # Number of buckets to divide spectra into
-  fillpeaks_df <- data.frame(reference_matrix, spectra_fillpeaks)
+                        lambda = lambda_fp,        # 2nd derivative penalty for primary smoothing
+                        hwi = hwi_fp,           # Half width of local windows
+                        it = it_fp,            # Number of iterations in suppression loop
+                        int = int_fp)         # Number of buckets to divide spectra into
+  fillpeaks_df <- data.frame(reference_matrix, spectra_fillpeaks$corrected)
   colnames(fillpeaks_df) <- colnames(spectra_df)
   return(fillpeaks_df)
 }
