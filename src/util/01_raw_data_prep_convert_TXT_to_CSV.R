@@ -17,7 +17,7 @@ load_txt_files <- function(file_name, dir) {
 
 split_file_name <- function(file_path) {
   file_name_with_ending <- basename(file_path)
-  file_name <- strsplit(file_name_with_ending, split = "\\.")[[1]][1]
+  file_name <- tools::file_path_sans_ext(file_name_with_ending)
   feature_list <- strsplit(file_name, split = "_")[[1]]
   return(feature_list)
 }
