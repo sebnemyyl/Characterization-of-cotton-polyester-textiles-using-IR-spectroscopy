@@ -6,7 +6,7 @@ import os
 import matplotlib.pyplot as plt
 
 print(os.getcwd())
-my_path = "../temp/30"
+my_path = "../temp/40"
 
 variance_dic = {}
 rsd_dic = {}
@@ -16,7 +16,7 @@ for r, d, f in os.walk(my_path):
     for file in f:
         if file.endswith(".csv"):
             # Load the data
-            data = pd.read_csv(f'../temp/30/{file}', sep=',', header=0)
+            data = pd.read_csv(f'../temp/40/{file}', sep=',', header=0)
 
             #related_data = data[(data['pet'] == 70) & (data['measuring_date'] >= 240626) & (data['specimen'].isin([1,2,3,4,5,6,7,8,9,10]))]
             related_data = data.drop(['reference.pet', 'reference.cotton','reference.area','reference.spot','reference.measuring_date','Unnamed: 0'], axis=1)
@@ -34,7 +34,7 @@ for r, d, f in os.walk(my_path):
             # Filter peaks by topN heights
             peak_heights = properties['peak_heights']
             # Sort the peak indices based on the heights in descending order and get the top 20
-            sorted_peak_indices = np.argsort(peak_heights)[-24:]
+            sorted_peak_indices = np.argsort(peak_heights)[-20:]
             top_20_peaks = peaks[sorted_peak_indices]
 
             # The peaks sorted by height
@@ -139,7 +139,7 @@ for method, specimen_rsds in rsd_dic.items():
     rsd_values = list(specimen_rsds.values())
     plt.plot(specimens, rsd_values, marker='o', label=method)
 
-plt.title('RSD for Different Baseline Correction Methods - 30% Cotton')
+plt.title('RSD for Different Baseline Correction Methods - 40% Cotton')
 plt.xlabel('Specimen')
 plt.ylabel('RSD (%)')
 plt.legend(title='Bl Correction Method')
