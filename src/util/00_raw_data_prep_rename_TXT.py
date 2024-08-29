@@ -3,8 +3,9 @@ from os import listdir
 import os
 
 print("Renaming starts")
+print(f"Current dir is ${os.getcwd()}")
 
-my_path = "../../input/clean_txt/NIR/240827_nir_not_clean"
+my_path = "input/clean_txt/not_clean/240827_nir_clean"
 
 def clean_up_desc(desc_with_suffix):
     desc = desc_with_suffix.split(".", 1)[0]
@@ -19,10 +20,10 @@ def clean_up_desc(desc_with_suffix):
     return desc
 
 def create_new_file_name(polyester_content, desc):
-    cotton_content = 100 - int(polyester_content)
+    cotton_content = 100 - polyester_content
     # extra marker, so that there are no overlaps 
     date = "240827"
-    new_name = "s_" + str(polyester_content) + "_" + str(cotton_content) + "_" + desc + "_" + date + ".txt"
+    new_name = "s_" + str(cotton_content) + "_" + str(polyester_content) + "_" + desc + "_" + date + ".txt"
     return new_name
 
 def starts_with_prefix(file):
@@ -44,8 +45,8 @@ for r, d, f in os.walk(my_path):
                 desc = clean_up_desc(desc_with_suffix)
                 # We round up when there is a decimal
                 if "_" in polyester_content:
-                    polyester_content = polyester_content.split("_")[0]
-                    polyester_content = int(polyester_content) + 1
+                    splitted = polyester_content.split("_")
+                    polyester_content = (int(splitted[0]) * 100 + int(splitted[1])) / 100
                 new_name = create_new_file_name(polyester_content, desc)
             else:
                 polyester_content = 50
