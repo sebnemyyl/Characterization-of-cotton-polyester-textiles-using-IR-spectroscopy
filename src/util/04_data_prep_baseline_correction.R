@@ -56,3 +56,14 @@ fillpeaks <- function(spectra_df, lambda_fp = 1, hwi_fp = 10 , it_fp = 6, int_fp
   colnames(fillpeaks_df) <- colnames(spectra_df)
   return(fillpeaks_df)
 }
+
+
+# Multiplicative Scatter Correction                                                          
+msc <- function(spectra_df) {
+  spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
+  reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
+  spectra_msc <- prospectr::msc(spectra_matrix, ref_spectrum = colMeans(spectra_matrix))
+  msc_df <- data.frame(reference_matrix, spectra_msc)
+  colnames(msc_df) <- colnames(spectra_df)
+  return(msc_df)
+}
