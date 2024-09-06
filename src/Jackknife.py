@@ -1,5 +1,4 @@
 import json
-
 import pandas as pd
 import itertools
 import numpy as np
@@ -18,6 +17,7 @@ def get_csv_files(path):
     files_in_path = os.listdir(path)
     csv_files = filter(lambda f: f.endswith(".csv"), files_in_path)
     return list(csv_files)
+
 def calc_relative_std(X):
     specimen_mean = np.mean(X)
     specimen_std = np.std(X)
@@ -26,7 +26,6 @@ def calc_relative_std(X):
     else:
         specimen_rsd = np.nan  # Handle case where mean is zero
     return specimen_rsd
-
 
 def find_key_wavenumbers(related_data):
     # Calculate the mean spectrum to identify peaks
@@ -38,7 +37,7 @@ def find_key_wavenumbers(related_data):
     # Filter peaks by topN heights
     peak_heights = properties['peak_heights']
     # Sort the peak indices based on the heights in descending order and get the top 20
-    sorted_peak_indices = np.argsort(peak_heights)[-5:]
+    sorted_peak_indices = np.argsort(peak_heights)[-8:]
     top_20_peaks = peaks[sorted_peak_indices]
 
     # The peaks sorted by height
@@ -65,7 +64,7 @@ def get_spectra_from_key_wavenumbers(related_data, key_wavenumbers):
     return result_series
 
 def run_jackknife(absorb_val_by_peaks):
-    group_size_leave_out = 16
+    group_size_leave_out = 10
     jackknife_by_specimen = {}  # to be refreshed each specimen and collect avg variance
     for L in range(0, len(absorb_val_by_peaks) - group_size_leave_out):
         # len(absorb_val_by_peaks) is the number of spots measured
@@ -83,21 +82,6 @@ def run_jackknife(absorb_val_by_peaks):
         jackknife_by_specimen[L] = np.nanmean(jackknife_est_var)
     return jackknife_by_specimen
 
-
-def plot_jackknife(jackknife_agg):
-    # Line plot of RSDs
-    # Iterate over each specimen in the nested dictionary
-    for specimen, data in jackknife_agg.items():
-        left_spots = list(data.keys())
-        rsd_values = list(data.values())
-        plt.plot(left_spots, rsd_values, marker='o', label=specimen)
-
-    plt.title(f'Jackknife Sampling by Specimen for {wn}')
-    plt.xlabel('Left-out spot')
-    plt.ylabel('Relative Std Dev')
-    plt.grid(True)
-
-    plt.show()
 
 
 start = time.perf_counter()
@@ -131,12 +115,11 @@ for r, d, f in os.walk(my_path):
                 end = time.perf_counter()
                 print(f" {end - start:0.4f} seconds")
 
-print(final_dict)
-json_path = '../temp/50/jackknife.json'
-json.dump(final_dict, open(json_path, 'w'))
+        #print(final_dict)
+        json_path = f'../temp/50/jackknife_{file}.json'
+        json.dump(final_dict, open(json_path, 'w'))
 
-loaded_dict = json.load(open(json_path,"r"))
-
-for wn in loaded_dict.keys():
-    jackknife_agg = final_dict[wn]
-    plot_jackknife(jackknife_agg)
+#loaded_dict = json.load(open(json_path,"r"))
+#for wn in loaded_dict.keys():
+#    jackknife_agg = final_dict[wn]
+#    plot_jackknife(jackknife_agg)

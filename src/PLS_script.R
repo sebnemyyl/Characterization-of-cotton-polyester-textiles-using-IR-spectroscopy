@@ -15,17 +15,18 @@ TEMP_DIR <- "temp"
 csv_path <- "input/spectra_nir_240827.csv"
 spectra_df_full <- load_csv(csv_path)
 
-spectra_reproducibility <- spectra_df_full %>% filter(reference.pet == 60 & reference.measuring_date == 240827)
+spectra_reproducibility <- spectra_df_full %>% filter(reference.pet == 60 & reference.measuring_date >= 240807)
 
 #spectra_df_clean <- clean_up_spectra(spectra_df_full)
 plot_spectra(spectra_reproducibility)
 
-baseline_correction_df <- stdnormalvariate(spectra_reproducibility)
+#baseline_correction_df <- stdnormalvariate(spectra_reproducibility)
 #baseline_correction_df <- detrend(spectra_reproducibility, 2)
 #baseline_correction_df <- als(spectra_reproducibility)
 #baseline_correction_df <- fillpeaks(spectra_reproducibility)
+baseline_correction_df <- msc(spectra_reproducibility)
 
-baseline_csv_path <- file.path(TEMP_DIR, "spectra_treated_std_40_cotton_nir.csv")
+baseline_csv_path <- file.path(TEMP_DIR, "spectra_treated_msc_40_cotton_nir.csv")
 save_csv(baseline_correction_df, baseline_csv_path, 5)
 baseline_correction_df_read <- load_saved_csv(baseline_csv_path)
 #baseline_correction_df <- load_csv(baseline_csv_path)

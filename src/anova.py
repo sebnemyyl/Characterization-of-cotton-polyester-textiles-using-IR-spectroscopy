@@ -16,7 +16,7 @@ for r, d, f in os.walk(my_path):
     for file in f:
         if file.endswith(".csv"):
             # Load the data
-            data = pd.read_csv(f'../temp/40/{file}', sep=',', header=0)
+            data = pd.read_csv(f'../temp/50/{file}', sep=',', header=0)
 
             #related_data = data[(data['pet'] == 70) & (data['measuring_date'] >= 240626) & (data['specimen'].isin([1,2,3,4,5,6,7,8,9,10]))]
             related_data = data.drop(['reference.pet', 'reference.cotton','reference.area','reference.spot','reference.measuring_date','Unnamed: 0'], axis=1)
@@ -92,10 +92,10 @@ for r, d, f in os.walk(my_path):
             rsd_dic[key].update(rsd_by_specimen)
 
             ## Plotting
-            plt.bar(range(len(variances_by_specimen)), list(variances_by_specimen.values()), align='center')
-            plt.xticks(range(len(variances_by_specimen)), list(variances_by_specimen.keys()))
-            plt.title('50% Cotton- 50% Polyester ~ NIR ~ Variances by Specimens')
-            plt.show()
+            # plt.bar(range(len(variances_by_specimen)), list(variances_by_specimen.values()), align='center')
+            # plt.xticks(range(len(variances_by_specimen)), list(variances_by_specimen.keys()))
+            # plt.title('50% Cotton- 50% Polyester ~ NIR ~ Variances by Specimens')
+            # plt.show()
 
             ## Perform ANOVA on each wavenumber
             results = {}
@@ -124,7 +124,7 @@ for method, specimen_variances in variance_dic.items():
     variance_values = list(specimen_variances.values())
     plt.plot(specimens, variance_values, marker='o', label=method)
 
-plt.title('Variance for Different Baseline Correction Methods - 50% Cotton')
+plt.title('Variance for Different Baseline Correction Methods - 23% Cotton')
 plt.xlabel('Specimen')
 plt.ylabel('Variance')
 plt.legend(title='Bl Correction Method')
@@ -139,9 +139,10 @@ for method, specimen_rsds in rsd_dic.items():
     rsd_values = list(specimen_rsds.values())
     plt.plot(specimens, rsd_values, marker='o', label=method)
 
-plt.title('RSD for Different Baseline Correction Methods - 40% Cotton')
+plt.title('RSD for Different Baseline Correction Methods - 50% Cotton')
 plt.xlabel('Specimen')
 plt.ylabel('RSD (%)')
+plt.ylim(0, 5)
 plt.legend(title='Bl Correction Method')
 plt.grid(True)
 
