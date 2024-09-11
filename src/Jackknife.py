@@ -37,12 +37,12 @@ def find_key_wavenumbers(related_data):
     # Filter peaks by topN heights
     peak_heights = properties['peak_heights']
     # Sort the peak indices based on the heights in descending order and get the top 20
-    sorted_peak_indices = np.argsort(peak_heights)[-8:]
-    top_20_peaks = peaks[sorted_peak_indices]
+    sorted_peak_indices = np.argsort(peak_heights)[-10:]
+    top_n_peaks = peaks[sorted_peak_indices]
 
     # The peaks sorted by height
-    top_20_peaks_sorted_by_height = top_20_peaks[np.argsort(peak_heights[sorted_peak_indices])[::-1]]
-    key_wavenumbers = related_data.columns[top_20_peaks_sorted_by_height].astype(str).tolist()
+    top_n_peaks_sorted_by_height = top_n_peaks[np.argsort(peak_heights[sorted_peak_indices])[::-1]]
+    key_wavenumbers = related_data.columns[top_n_peaks_sorted_by_height].astype(str).tolist()
     return sorted_peak_indices, key_wavenumbers
 
 
@@ -63,6 +63,11 @@ def get_spectra_from_key_wavenumbers(related_data, key_wavenumbers):
     result_series = pd.Series([transposed_array[i] for i in range(transposed_array.shape[0])], index=original_keys)
     return result_series
 
+def bootstrap_resampling(data, n_iterations):
+    n = 1000
+    bootstrap_samples = np.random.choice(data, (n_iterations, n), replace=True)
+    return bootstrap_samples
+
 def run_jackknife(absorb_val_by_peaks):
     group_size_leave_out = 10
     jackknife_by_specimen = {}  # to be refreshed each specimen and collect avg variance
@@ -82,6 +87,23 @@ def run_jackknife(absorb_val_by_peaks):
         jackknife_by_specimen[L] = np.nanmean(jackknife_est_var)
     return jackknife_by_specimen
 
+def run_bootstrap(absorb_val_by_peaks):
+    group_size_leave_out = 4
+    bootstrap_by_specimen = {}  # to be refreshed each specimen and collect avg variance
+    for L in range(2, len(absorb_val_by_peaks) - group_size_leave_out):
+        # len(absorb_val_by_peaks) is the number of spots measured
+        bootstrap_est_var = []
+        # Generate bootstrap samples
+        bootstrap_samples = bootstrap_resampling(absorb_val_by_peaks, L)
+
+        # Calculate the mean and stdev of each bootstrap sample
+        bootstrap_std_error = np.std(bootstrap_samples, axis=0)
+        bootstrap_std_means = np.mean(bootstrap_samples, axis=0)
+        specimen_rsd = (bootstrap_std_error / bootstrap_std_means) * 100
+
+        bootstrap_est_var = np.append(bootstrap_est_var, specimen_rsd)
+        bootstrap_by_specimen[L] = np.nanmean(bootstrap_est_var)
+    return bootstrap_by_specimen
 
 
 start = time.perf_counter()
@@ -93,7 +115,7 @@ for r, d, f in os.walk(my_path):
             print(file)
             # Load the data
             data = pd.read_csv(f'../temp/50/{file}', sep=',', header=0)
-            related_data = data[data['reference.specimen'].isin([1, 2, 3])]
+            related_data = data[data['reference.specimen'].isin([1, 2, 3, 4 ,5])]
             related_data = related_data.drop(['reference.pet', 'reference.cotton','reference.area','reference.spot','reference.measuring_date','Unnamed: 0'], axis=1)
 
             specimens = related_data[related_data.columns[0]]
@@ -105,21 +127,28 @@ for r, d, f in os.walk(my_path):
             final_dict = {}
             for wn_index, wn in enumerate(key_wavenumbers):
                 print(f"wn: {wn}")
-                jackknife_by_specimen_agg = {}
+                #jackknife_by_specimen_agg = {}
+                bootstrap_by_specimen_agg = {}
+
                 for specimen in result_series.keys():
                     print(specimen)
                     absorb_val_by_peaks = result_series.get(specimen)[wn_index][:]
-                    jackknife_by_specimen = run_jackknife(absorb_val_by_peaks)
-                    jackknife_by_specimen_agg[specimen] = jackknife_by_specimen
-                final_dict[wn] = jackknife_by_specimen_agg
-                end = time.perf_counter()
-                print(f" {end - start:0.4f} seconds")
+                    #jackknife_by_specimen = run_jackknife(absorb_val_by_peaks)
+                    #jackknife_by_specimen_agg[specimen] = jackknife_by_specimen
+                    bootstrap_by_specimen = run_bootstrap(absorb_val_by_peaks)
+                    bootstrap_by_specimen_agg[specimen] = bootstrap_by_specimen
+                    print(bootstrap_by_specimen_agg)
+                final_dict[wn] = bootstrap_by_specimen_agg #jackknife_by_specimen_agg
+
 
         #print(final_dict)
-        json_path = f'../temp/50/jackknife_{file}.json'
+        json_path = f'../temp/50/bootstrap_{file}.json'
         json.dump(final_dict, open(json_path, 'w'))
 
-#loaded_dict = json.load(open(json_path,"r"))
-#for wn in loaded_dict.keys():
-#    jackknife_agg = final_dict[wn]
-#    plot_jackknife(jackknife_agg)
+end = time.perf_counter()
+print(f" {end - start:0.4f} seconds")
+
+# loaded_dict = json.load(open(json_path,"r"))
+# for wn in loaded_dict.keys():
+#     jackknife_agg = final_dict[wn]
+#     plot_jackknife(jackknife_agg)
