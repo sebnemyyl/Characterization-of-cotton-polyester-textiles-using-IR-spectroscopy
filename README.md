@@ -1,1 +1,1 @@
-# spectroscopy
+# This project aims to quantify cotton and polyester ratios in textiles using Near_Infrared (NIR) and Mid-Infrared (MIR) spectral data. Best performing regression model and optimum hyperparameter space are investigated.
