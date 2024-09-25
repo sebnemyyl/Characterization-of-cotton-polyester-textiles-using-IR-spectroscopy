@@ -22,3 +22,18 @@ def plot_jackknife(jackknife_bootstrap_agg, wn, type='jackknife'):
         plt.grid(True)
         plt.legend(loc="upper right")
         plt.show()
+
+def plot_p_values(averaged_pvalues):
+    # Line plot of RSDs
+    # Iterate over each specimen in the nested dictionary
+    for spectra, specimen_p_value in averaged_pvalues.items():
+        sample_size = list(specimen_p_value.keys())
+        avg_p_values = list(specimen_p_value.values())
+        plt.plot(sample_size, avg_p_values, marker='o', label=spectra)
+
+    plt.title(f'Averaged p-value for top 10 wavenumber')
+    plt.xlabel('Sample size')
+    plt.ylabel('Avg p-value')
+    plt.grid(True)
+    plt.legend(loc="upper left")
+    plt.show()

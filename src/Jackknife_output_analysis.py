@@ -11,12 +11,12 @@ print(os.getcwd())
 #os.chdir("..")
 
 
-json_path = f'../temp/jackknife_spectra_treated_snv_30_cotton_nir.json'
+json_path = f'../temp/bootstrap_spectra_treated_detrend_50_cotton_nir.csv.json'
 
 loaded_dict = json.load(open(json_path,"r"))
 for wn in loaded_dict.keys():
    jackknife_agg = loaded_dict[wn]
-   jackknife.plot_jackknife(jackknife_agg, wn, type="jackknife")
+   jackknife.plot_jackknife(jackknife_agg, wn, type="bootstrap")
 
 
 # Average the Jackknife results
@@ -46,7 +46,7 @@ averaged_data = {key: {inner_key: np.mean(values) for inner_key, values in inner
 spectra_avg = {"spectra_avg": averaged_data}
 
 
-jackknife.plot_jackknife(averaged_data, wn="Top 10 wavenumbers", type="jackknife")
+jackknife.plot_jackknife(averaged_data, wn="Top 10 wavenumbers", type="bootstrap")
 
 
 ### Hypothesis testing
@@ -84,10 +84,13 @@ for specimen_key, jk_value in spectra_avg.items():
             if inner_key not in averages_for_chi_sq[sub_key]:
                 averages_for_chi_sq[sub_key][inner_key] = []
             averages_for_chi_sq[sub_key][inner_key].append(inner_value)
-print(averages_for_chi_sq)
+#print(averages_for_chi_sq)
 
 
 if chi_squared_test(sample_variance=0.012, full_variance=0.010, sample_size=100, confidence_level=0.95, alpha=0.05):
     print(f"You can remove  items and still maintain true variance with 95% confidence.")
 else:
     print(f"Removing  items breaks the 95% confidence interval.")
+
+
+
