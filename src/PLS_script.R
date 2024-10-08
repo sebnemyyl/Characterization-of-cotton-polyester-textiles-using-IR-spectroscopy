@@ -54,8 +54,8 @@ filtered_data_nir <- bind_cols(baseline_correction_df_nir %>% dplyr::select(-sta
 #baseline_correction_df <- fillpeaks(spectra_reproducibility)
 #baseline_correction_df <- msc(spectra_reproducibility)
 
-#baseline_csv_path <- file.path(TEMP_DIR, "spectra_treated_msc_40_cotton_nir.csv")
-#save_csv(baseline_correction_df, baseline_csv_path, 5)
+baseline_csv_path <- file.path(TEMP_DIR, "spectra_treated_snv_nir.csv")
+save_csv(filtered_data_nir, baseline_csv_path, 5)
 #baseline_correction_df_read <- load_saved_csv(baseline_csv_path)
 #baseline_correction_df <- load_csv(baseline_csv_path)
 #plot_spectra(baseline_correction_df_read)
@@ -108,7 +108,7 @@ plot(MSEP(pls), legendpos = "topright",main="RMSEP PLS")
 print("multiblock MSEP result")
 print(multiblock::MSEP(multiblock_pls))
 print("pls MSEP result")
-print(MSEP(pls))
+print(RMSEP(pls))
 
 plot(multiblock::MSEP(multiblock_pls),legendpos = "topright",main="MSEP Multiblock PLS")
 

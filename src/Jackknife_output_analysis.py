@@ -11,7 +11,7 @@ print(os.getcwd())
 #os.chdir("..")
 
 
-json_path = f'../temp/bootstrap_spectra_treated_detrend_50_cotton_nir.csv.json'
+json_path = f'../temp/bootstrap/bootstrap_spectra_treated_snv_50_cotton_nir.json'
 
 loaded_dict = json.load(open(json_path,"r"))
 for wn in loaded_dict.keys():

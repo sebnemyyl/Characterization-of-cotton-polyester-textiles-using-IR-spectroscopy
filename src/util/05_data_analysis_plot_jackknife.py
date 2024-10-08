@@ -21,6 +21,7 @@ def plot_jackknife(jackknife_bootstrap_agg, wn, type='jackknife'):
         plt.ylabel('Relative Std Dev')
         plt.grid(True)
         plt.legend(loc="upper right")
+        plt.gca().invert_xaxis()
         plt.show()
 
 def plot_p_values(averaged_pvalues):

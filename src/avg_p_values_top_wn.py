@@ -1,5 +1,5 @@
 # First Bootstrap will be migrated here and then the Jackknife is to be implemented
-
+import pickle
 from collections import defaultdict
 from scipy import stats
 # import importlib.util
@@ -12,15 +12,19 @@ import matplotlib.pyplot as plt
 
 print(os.getcwd())
 my_path = "../temp/jackknife"
-os.chdir("..")
+os.chdir("")
 
 def get_csv_files(path):
     files_in_path = os.listdir(path)
     csv_files = filter(lambda f: f.endswith(".csv"), files_in_path)
     return list(csv_files)
 
-loaded_dict = json.load(open("../temp/jackknife/jackknife_spectra_treated_detrend_50_cotton_nir.json","r"))
+#loaded_dict = json.load(open("../temp/bootstrap/bootstrap_spectra_treated_als_50_cotton_nir.csv.json","r"))
 
+
+# Load the dictionary from a file
+with open('../temp/bootstrap/bootstrap_spectra_treated_als_50_cotton_nir.csv.pkl', 'rb') as f:
+    loaded_dict = pickle.load(f)
 
 # Dictionary to store p-values for each specimen, grouped by spectrum
 p_values_by_spectrum_and_sample_size = defaultdict(lambda: defaultdict(list))
@@ -30,12 +34,12 @@ p_values = {}
 
 for spectra, specimen_sample_size in loaded_dict.items():
     for specimen, jackknife in specimen_sample_size.items():
-        baseline_data = jackknife["0"]
+        baseline_data = jackknife[19]
 
         # Loop through sample sizes from 2 to 9 for comparison
         for sample_size in range(4, 16):
             # Extract the bootstrap data for the current sample_size
-            current_data = jackknife[f'{sample_size}']
+            current_data = jackknife[sample_size]
 
             # Perform an F-test to compare the variances (or use a different test if needed)
             F_statistic, p_value = stats.f_oneway(current_data, baseline_data)
