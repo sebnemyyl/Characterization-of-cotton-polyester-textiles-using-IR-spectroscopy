@@ -1,4 +1,5 @@
 library(dplyr)
+library(stringr)
 
 clean_up_spectra <- function(spectra_df, type = "nir") {
   reference <- spectra_df %>% dplyr::select(starts_with("reference"))
@@ -14,7 +15,7 @@ clean_up_spectra <- function(spectra_df, type = "nir") {
   } else if (type == "mir") {
     columns_to_keep <- (wavenumbers >= 1801.44478 & wavenumbers <= 2798.60426)
   } else {
-    stop("This type is not supported")
+    stop(str_glue("Type {type} is not supported"))
   }
   filtered_spectra <- spectra[, columns_to_keep]
   # Recreate data frame
