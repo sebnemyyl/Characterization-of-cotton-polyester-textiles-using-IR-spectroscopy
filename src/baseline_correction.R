@@ -35,7 +35,7 @@ save_csv_with_baseline_corr <- function(spectra_df_clean, output_dir, type = "ni
 csv_path <- "input/spectra_nir_240827.csv"
 type <- "nir"
 spectra_df_full <- load_csv(csv_path)
-spectra_df_clean <- clean_up_spectra(spectra_df_full, type)
+spectra_df_clean <- clean_up_spectra(spectra_df_full, type, remove_waterband = FALSE)
 
 output_dir <- "temp"
 baseline_corr_types <- list("snv", "detrend", "als", "fillpeaks", "msc")
