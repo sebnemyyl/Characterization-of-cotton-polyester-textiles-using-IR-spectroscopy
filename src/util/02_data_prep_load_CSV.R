@@ -17,11 +17,11 @@ load_csv <- function(csv_path) {
   return(spectra_df)
 }
 
-save_csv <- function(spectra_df, csv_path, digits) {
-  df_decimals_truncated <- format(spectra_df, digits=5)
+save_csv <- function(spectra_df, csv_path, digits = 5) {
+  df_decimals_truncated <- format(spectra_df, digits)
   write.csv(df_decimals_truncated, file=csv_path)
 }
 
 load_saved_csv <- function(csv_path) {
-  return(read.csv(csv_path))
+  return(read.csv(csv_path, row.names = 1))
 }
