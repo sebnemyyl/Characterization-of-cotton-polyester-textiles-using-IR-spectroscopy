@@ -7,7 +7,6 @@ source("src/util/03_data_prep_limit_spectra.R")
 source("src/util/04_data_prep_baseline_correction.R")
 source("src/util/05_data_analysis_plot_spectra.R")
 
-## TODO water band configurable
 ## TODO filter per cotton content
 
 save_csv_with_baseline_corr <- function(spectra_df_clean, output_dir, type = "nir", baseline_corr = "snv") {
@@ -34,10 +33,11 @@ save_csv_with_baseline_corr <- function(spectra_df_clean, output_dir, type = "ni
 
 csv_path <- "input/spectra_nir_240827.csv"
 type <- "nir"
+# TODO make all CSV files work with load_saved_csv
 spectra_df_full <- load_csv(csv_path)
 spectra_df_clean <- clean_up_spectra(spectra_df_full, type, remove_waterband = FALSE)
 
-output_dir <- "temp"
+output_dir <- "temp/test"
 baseline_corr_types <- list("snv", "detrend", "als", "fillpeaks", "msc")
 for (baseline_corr in baseline_corr_types) {
   save_csv_with_baseline_corr(spectra_df_clean, output_dir, type, baseline_corr)
