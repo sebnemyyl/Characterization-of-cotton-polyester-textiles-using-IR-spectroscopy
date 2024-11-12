@@ -1,8 +1,5 @@
-import json
-import importlib.util
-spec = importlib.util.spec_from_file_location("plot_jackknife", "util\\05_data_analysis_plot_jackknife.py")
-jackknife = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(jackknife)
+import pickle
+import util.m05_data_analysis_plot_jackknife as jackknife
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,9 +8,10 @@ print(os.getcwd())
 #os.chdir("..")
 
 
-json_path = f'../temp/bootstrap/bootstrap_spectra_treated_snv_50_cotton_nir.json'
+# TODO use pickle instead!
+json_path = f'temp/bootstrap50/jackknife_spectra_nir_resampling_snv.pkl'
+loaded_dict = pickle.load(open(json_path,"rb"))
 
-loaded_dict = json.load(open(json_path,"r"))
 for wn in loaded_dict.keys():
    jackknife_agg = loaded_dict[wn]
    jackknife.plot_jackknife(jackknife_agg, wn, type="bootstrap")
