@@ -1,19 +1,19 @@
 # Before running script always set the work directory to top-level of the repository.
-setwd("C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo")
-#setwd(".")
+#setwd("C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo")
+setwd(".")
 
 source("src/util/02_data_prep_load_CSV.R")
 source("src/util/03_data_prep_limit_spectra.R")
-debugSource("src/util/04_data_prep_baseline_correction.R")
+source("src/util/04_data_prep_baseline_correction.R")
 source("src/util/05_data_analysis_plot_spectra.R")
-debugSource("src/util/06_model_pls.R")
+source("src/util/06_model_pls.R")
 
 
 par(mfrow = c(1, 1))
 
 TEMP_DIR <- "temp"
-csv_path1 <- "input/spectra_nir_240827.csv"
-csv_path2 <- "input/spectra_mir_240814.csv"
+csv_path1 <- "input/raw_csv/spectra_nir_240827.csv"
+csv_path2 <- "input/raw_csv/spectra_mir_240814.csv"
 
 spectra_df_full1 <- load_csv(csv_path1)
 spectra_df_full2 <- load_csv(csv_path2)
