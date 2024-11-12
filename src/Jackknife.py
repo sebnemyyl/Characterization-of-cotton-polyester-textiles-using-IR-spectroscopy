@@ -15,8 +15,7 @@ import pickle
 
 print(os.getcwd())
 
-my_path = "output/example50"
-#my_path = "temp/50"
+my_path = "temp/resampling"
 
 variance_dic = {}
 rsd_dic = {}
@@ -31,8 +30,6 @@ def calculate_averages(d):
     else:
         return d
 
-
-
 def get_csv_files(path):
     files_in_path = os.listdir(path)
     csv_files = filter(lambda f: f.endswith(".csv"), files_in_path)
@@ -40,23 +37,26 @@ def get_csv_files(path):
 
 # Needs to be true otherwise JackKnife doesn't work correctly!!
 # TODO move it somewhere better!
-def has_equal_specimen_count(df):
-    specimen_counts_df = df.groupby('reference.specimen').size()
-    specimen_counts = specimen_counts_df.to_numpy()
-    all_counts_equal = (specimen_counts[0] == specimen_counts).all()
+# TODO rename to something like every specimen should have same number of spots!
+def are_spots_per_specimen_equal(df):
+    spots_per_specimen_df = df.groupby('reference.specimen').size()
+    spots_per_specimen = spots_per_specimen_df.to_numpy()
+    all_counts_equal = (spots_per_specimen[0] == spots_per_specimen).all()
     if not all_counts_equal:
-        print("Actual Specimen Counts:")
-        print(specimen_counts_df)
+        print("Number of spots per specimen:")
+        print(spots_per_specimen_df)
     return all_counts_equal
 
 def resample_csv_file(csv_file):
     data = pd.read_csv(csv_file, sep=',', header=0)
     related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
-    #related_data = related_data.query("`reference.cotton` == 50")
+    cotton_contents = related_data['reference.cotton'].unique()
+    print(cotton_contents)
+    related_data = related_data.query("`reference.cotton` == 50") # contents: [50 23 35 30 25]
     related_data = related_data.drop(['reference.pet', 'reference.cotton', 'reference.area', 'reference.spot',
                                               'reference.measuring_date', 'Unnamed: 0'], axis=1)
 
-    assert has_equal_specimen_count(related_data), "Specimen counts are not equal!"
+    assert are_spots_per_specimen_equal(related_data), "Number of spots per specimen are not equal!"
 
     (sorted_peak_indices, key_wavenumbers) = resampling_methods.find_key_wavenumbers(related_data)
 
@@ -89,9 +89,9 @@ def resample_csv_file(csv_file):
         #final_dict_averaged = calculate_averages(final_dict)
         #json_path = f'../temp/bootstrap/bootstrap_{file}.json'
         #json.dump(final_dict, open(json_path, 'w'))
-        with open(f'bootstrap_{file}.pkl', 'wb') as f:
-            pickle.dump(final_dict, f)
-        print("Pickle dumped!")
+    with open(f'bootstrap_{file}.pkl', 'wb') as f:
+        pickle.dump(final_dict, f)
+    print("Pickle dumped!")
 
 csv_files = get_csv_files(my_path)
 for file in csv_files:
