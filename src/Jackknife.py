@@ -47,57 +47,64 @@ def are_spots_per_specimen_equal(df):
         print(spots_per_specimen_df)
     return all_counts_equal
 
-def resample_csv_file(csv_file):
+def approximate_required_spots(absorb_val_by_peaks):
+    Z = 1.96  # Z-score for 95% confidence level
+    E = 0.005  # Margin of error
+    absorb_val_by_peaks_stdev = np.std(absorb_val_by_peaks, axis=0)
+    # Function to calculate required spots
+    approximate_required_spots = int(np.square((Z * absorb_val_by_peaks_stdev) / E))
+    print(f' approximate sample size: {approximate_required_spots}')
+
+def resample_csv_file(csv_file, cotton = -1, type = "bootstrap", output_dir="."):
     data = pd.read_csv(csv_file, sep=',', header=0)
-    related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
-    cotton_contents = related_data['reference.cotton'].unique()
-    print(cotton_contents)
-    related_data = related_data.query("`reference.cotton` == 50") # contents: [50 23 35 30 25]
+    #related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
+    #cotton_contents = related_data['reference.cotton'].unique() # contents: [50 23 35 30 25]
+    related_data = data
+    if cotton > 0:
+        related_data = related_data.query(f"`reference.cotton` == {cotton}") 
     related_data = related_data.drop(['reference.pet', 'reference.cotton', 'reference.area', 'reference.spot',
                                               'reference.measuring_date', 'Unnamed: 0'], axis=1)
-
     assert are_spots_per_specimen_equal(related_data), "Number of spots per specimen are not equal!"
 
-    (sorted_peak_indices, key_wavenumbers) = resampling_methods.find_key_wavenumbers(related_data)
-
-    result_series = resampling_methods.get_spectra_from_key_wavenumbers(related_data, key_wavenumbers)
+    # We find the 10 highest peaks, which are our key wavenumbers
+    (_, key_wavenumbers) = resampling_methods.find_key_wavenumbers(related_data, 10)
+    key_spectra_grouped_by_specimen = resampling_methods.get_spectra_from_key_wavenumbers(related_data, key_wavenumbers)
 
     final_dict = {}
     for wn_index, wn in enumerate(key_wavenumbers):
-        print(f"wn: {wn}")
-        #jackknife_by_specimen_agg = {}
-        bootstrap_by_specimen_agg = {}
+        print(f"Wave number: {wn}")
+        resample_by_specimen_agg = {}
 
-        for specimen in result_series.keys():
-            absorb_val_by_peaks = result_series.get(specimen)[wn_index][:]
+        for specimen in key_spectra_grouped_by_specimen.keys():
+            absorb_val_by_peaks = key_spectra_grouped_by_specimen.get(specimen)[wn_index][:]
+            #approximate_required_spots(absorb_val_by_peaks)
 
-            Z = 1.96  # Z-score for 95% confidence level
-            E = 0.005  # Margin of error
-            absorb_val_by_peaks_stdev = np.std(absorb_val_by_peaks, axis=0)
-            # Function to calculate required spots
-            approximate_required_spots = int(np.square((Z * absorb_val_by_peaks_stdev) / E))
-            print(f' approximate sample size: {approximate_required_spots}')
-
-            #jackknife_by_specimen = resampling_methods.run_jackknife(absorb_val_by_peaks)
-            #jackknife_by_specimen_agg[specimen] = jackknife_by_specimen
-            bootstrap_by_specimen = resampling_methods.run_bootstrap(absorb_val_by_peaks)
-            bootstrap_by_specimen_agg[specimen] = bootstrap_by_specimen
-        final_dict[wn] = bootstrap_by_specimen_agg
-        #final_dict[wn] = jackknife_by_specimen_agg
-
+            if type == "jackknife":
+                jackknife_by_specimen = resampling_methods.run_jackknife(absorb_val_by_peaks)
+                resample_by_specimen_agg[specimen] = jackknife_by_specimen
+            elif type == "bootstrap":
+                bootstrap_by_specimen = resampling_methods.run_bootstrap(absorb_val_by_peaks)
+                resample_by_specimen_agg[specimen] = bootstrap_by_specimen
+            else:
+                raise Exception(f"{type} not supported!")
+        final_dict[wn] = resample_by_specimen_agg
 
         #final_dict_averaged = calculate_averages(final_dict)
         #json_path = f'../temp/bootstrap/bootstrap_{file}.json'
         #json.dump(final_dict, open(json_path, 'w'))
-    with open(f'bootstrap_{file}.pkl', 'wb') as f:
+    file_name_without_ending = os.path.splitext(file)[0]
+    pickle_file_name = f'{type}_{file_name_without_ending}.pkl'
+    output_path = os.path.join(output_dir, pickle_file_name)
+    with open(output_path, 'wb') as f:
         pickle.dump(final_dict, f)
-    print("Pickle dumped!")
+    print(f"Pickle dumped to {output_path}")
 
+output_dir = "temp/bootstrap50"
 csv_files = get_csv_files(my_path)
 for file in csv_files:
     csv_file = os.path.join(my_path, file)
     print(csv_file)
-    resample_csv_file(csv_file)
+    resample_csv_file(csv_file, cotton=50, type="bootstrap", output_dir=output_dir)
 
 ## TODO make configurable for bootstrap and Jackknife
 

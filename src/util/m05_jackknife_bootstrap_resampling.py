@@ -16,7 +16,7 @@ def calc_relative_std(X):
         specimen_rsd = np.nan  # Handle case where mean is zero
     return specimen_rsd
 
-def find_key_wavenumbers(related_data):
+def find_key_wavenumbers(related_data, top_n_peaks=10):
     # Calculate the mean spectrum to identify peaks
     mean_spectrum = related_data.mean(axis=0)
 
@@ -25,8 +25,8 @@ def find_key_wavenumbers(related_data):
 
     # Filter peaks by topN heights
     peak_heights = properties['peak_heights']
-    # Sort the peak indices based on the heights in descending order and get the top 20
-    sorted_peak_indices = np.argsort(peak_heights)[-10:]
+    # Sort the peak indices based on the heights in descending order and get the top n peaks
+    sorted_peak_indices = np.argsort(peak_heights)[-top_n_peaks:]
     top_n_peaks = peaks[sorted_peak_indices]
 
     # The peaks sorted by height
