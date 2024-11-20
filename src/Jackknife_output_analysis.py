@@ -8,43 +8,17 @@ print(os.getcwd())
 #os.chdir("..")
 
 
-# TODO use pickle instead!
-json_path = f'temp/bootstrap50/jackknife_spectra_nir_resampling_snv.pkl'
+#json_path = f'../temp/jackknife/jackknife_spectra_nir_50_snv_resampling.pkl'
+json_path = f'../temp/bootstrap/bootstrap_spectra_treated_snv_50_cotton_nir.csv.pkl'
+
 loaded_dict = pickle.load(open(json_path,"rb"))
 
 for wn in loaded_dict.keys():
    jackknife_agg = loaded_dict[wn]
-   jackknife.plot_jackknife(jackknife_agg, wn, type="bootstrap")
+   jackknife.plot_resampling(jackknife_agg, wn, type="bootstrap")
 
 
-# Average the Jackknife results
-# First it collects the Jk results from each wavenumber and dumps into
-# an array associated to a specimen number
-# Then averages the values in each array
-
-averages = {}
-
-for spectra_key, spectra_value in loaded_dict.items():
-    for sub_key, sub_value in spectra_value.items():
-        if sub_key not in averages:
-            averages[sub_key] = {}
-
-        for inner_key, inner_value in sub_value.items():
-            if inner_key not in averages[sub_key]:
-                averages[sub_key][inner_key] = []
-
-            # Append the float values to a list to compute the average later
-            averages[sub_key][inner_key].append(inner_value)
-
-# Compute the average for each key
-averaged_data = {key: {inner_key: np.mean(values) for inner_key, values in inner_dict.items()}
-                 for key, inner_dict in averages.items()}
-
-# Convert to the required format
-spectra_avg = {"spectra_avg": averaged_data}
-
-
-jackknife.plot_jackknife(averaged_data, wn="Top 10 wavenumbers", type="bootstrap")
+jackknife.plot_resampling_top_n(loaded_dict, type="bootstrap")
 
 
 ### Hypothesis testing
