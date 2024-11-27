@@ -23,6 +23,8 @@ def plot_resampling(jackknife_bootstrap_agg, wn, type='jackknife'):
             rsd_values = list(data.values())
             avg_rsd_values = np.mean(rsd_values, axis=1)
             plt.plot(left_spots, avg_rsd_values, marker='o', label=specimen)
+            xint = range(min(left_spots), max(left_spots) + 1)
+            plt.xticks(xint)
 
         plt.title(f'Bootstrap Sampling by Specimen for {wn}')
         plt.xlabel('Resample size')
@@ -58,6 +60,8 @@ def plot_resampling_top_n(loaded_dict , type='jackknife'):
         left_spots = list(data.keys())
         rsd_values = list(data.values())
         plt.plot(left_spots, rsd_values, marker='o', label=specimen)
+        xint = range(min(left_spots), max(left_spots) + 1)
+        plt.xticks(xint)
 
     if type == 'jackknife':
         plt.title(f'Jackknife Sampling by top 10 wavenumbers')
