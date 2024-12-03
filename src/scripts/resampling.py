@@ -1,6 +1,7 @@
 import os
 import sys
 # Needed for Python to find the util modules
+sys.path.insert(0, "src")
 sys.path.insert(0, "..")
 
 import util.m05_resampling as resampling
