@@ -57,7 +57,7 @@ def bootstrap_resampling(data, n_iterations):
     return bootstrap_samples
 
 def run_jackknife(absorb_val_by_peaks):
-    group_size_leave_out = 10
+    group_size_leave_out = 2
     jackknife_by_specimen = {}  # to be refreshed each specimen and collect avg variance
     for L in range(0, len(absorb_val_by_peaks) - group_size_leave_out):
         # len(absorb_val_by_peaks) is the number of spots measured
@@ -78,7 +78,7 @@ def run_jackknife(absorb_val_by_peaks):
 def run_bootstrap(absorb_val_by_peaks):
     max_resample_size = 20
     bootstrap_by_specimen = {}  # to be refreshed each specimen and collect avg variance
-    for L in range(2, max_resample_size):
+    for L in range(3, max_resample_size+1):
         # len(absorb_val_by_peaks) is the number of spots measured
         bootstrap_est_var = []
         # Generate bootstrap samples
@@ -89,9 +89,9 @@ def run_bootstrap(absorb_val_by_peaks):
         bootstrap_means = np.mean(bootstrap_samples, axis=0)
         specimen_rsd = (bootstrap_stdev / bootstrap_means) * 100
         bootstrap_var = np.var(bootstrap_samples, axis=0)
+        #specimen_rsd = calc_relative_std(bootstrap_samples)
 
-
-        bootstrap_est_var = np.append(bootstrap_est_var, bootstrap_var)
+        bootstrap_est_var = np.append(bootstrap_est_var, specimen_rsd)
         bootstrap_by_specimen[L] = bootstrap_est_var
     return bootstrap_by_specimen
 
