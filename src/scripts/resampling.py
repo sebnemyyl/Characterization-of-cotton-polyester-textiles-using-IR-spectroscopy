@@ -1,10 +1,18 @@
 import os
+import sys
+# Needed for Python to find the util modules
+sys.path.insert(0, "..")
+
 import util.m05_resampling as resampling
 import util.m00_general_util as util
 
+
+
+os.chdir("..")
 print(os.getcwd())
-input_dir = "temp/resampling"
-output_dir = "temp/bootstrap50"
+
+input_dir = "../input/clean_csv/resampling"
+output_dir = "../input"
 csv_files = util.get_csv_files(input_dir)
 for file in csv_files:
     csv_file = os.path.join(input_dir, file)
