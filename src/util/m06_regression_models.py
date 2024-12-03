@@ -9,6 +9,22 @@ import pandas as pd
 import numpy as np
 import time
 
+
+def load_feature_set(csv_file):
+    baseline_corrected_data = pd.read_csv(csv_file, sep=',', header=0)
+    # Convert the cotton column to numeric and handle errors
+    baseline_corrected_data['reference.cotton'] = pd.to_numeric(baseline_corrected_data['reference.cotton'], errors='coerce')
+    # Drop rows with missing cotton values
+    data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
+
+    # Prepare the feature set (exclude non-spectral and cotton columns)
+    X = data_clean.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
+    X.columns = X.columns.str.replace('spectra.', '')
+    # Prepare the target column (cotton content)
+    y = data_clean['reference.cotton']
+    return (X, y)
+
+
 models = {
     "SVR": RandomizedSearchCV(
         SVR(kernel="rbf"),
@@ -42,6 +58,7 @@ models = {
     )
 }
 
+
 def evaluate_model(model_name, X_train, X_test, y_train, y_test):
     model = models[model_name]
     # Train the model
@@ -66,18 +83,3 @@ def evaluate_model(model_name, X_train, X_test, y_train, y_test):
         "mse": mse,
         "r2": r2
     }
-
-def load_feature_set(csv_file):
-    baseline_corrected_data = pd.read_csv(csv_file, sep=',', header=0)
-    # Convert the cotton column to numeric and handle errors
-    baseline_corrected_data['reference.cotton'] = pd.to_numeric(baseline_corrected_data['reference.cotton'], errors='coerce')
-    # Drop rows with missing cotton values
-    data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
-
-    # Prepare the feature set (exclude non-spectral and cotton columns)
-    X = data_clean.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
-    X.columns = X.columns.str.replace('spectra.', '')
-    # Prepare the target column (cotton content)
-    y = data_clean['reference.cotton']
-
-    return (X, y)
