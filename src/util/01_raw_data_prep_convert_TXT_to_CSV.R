@@ -59,7 +59,8 @@ convert_txt_to_dataframe <- function(dir) {
   return(spectra)
 }
 
-spectra <- convert_txt_to_dataframe(dir = "input/clean_txt/NIR")
+
+#spectra <- convert_txt_to_dataframe(dir = "input/clean_txt/NIR")
 #write to csv file
-write.csv2(spectra, "spectra_nir_240827.csv", row.names = TRUE)
+#write.csv2(spectra, "spectra_nir_240827.csv", row.names = TRUE)
 #setwd('C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo/src')

@@ -20,7 +20,7 @@ test_train_split <- function(spectra_df){
   return(train_data, test_data)
   
 }
-run_pls <- function(spectra_df, rds_path) {
+run_pls <- function(spectra_df, rds_path = "") {
   options(digits = 4)
   pls.options(plsalg = "oscorespls")
   ref_cotton <- spectra_df$reference.cotton
@@ -131,7 +131,6 @@ plot_loading <- function(pls) {
        col = "black", cex = 1.2)
 }
 
-
 plot_multiblockpls_predicted_vs_measured <- function(pls, joined_data) {
   Y = joined_data %>% select(starts_with("reference.cotton"))
   
@@ -147,5 +146,50 @@ plot_multiblockpls_predicted_vs_measured <- function(pls, joined_data) {
          x = "Actual Values",
          y = "Predicted Values") +
     theme_minimal()
-  
+}
+
+perform_pls_regression <- function(spectra, plot_results = FALSE) {
+  #### Conventional PLS
+  train_time_pls <- system.time({
+    pls <- run_pls(spectra)
+  })[["elapsed"]]
+  msep_pls <- MSEP(pls)
+  adjCV_pls <- msep_pls$val[2, , 11]
+  rmsep_pls <- sqrt(adjCV_pls)
+  r2_pls <- R2(pls)
+  pls_metrics <- list(
+    model = "pls",
+    rmse = rmsep_pls,
+    r2 = r2_pls$val[1, , 11],
+    training_time = train_time_pls
+  )
+  if (plot_results) {
+    plot_pls(pls)
+    plot_predicted_vs_measured(pls, spectra)
+    plot_loading(pls)
+    plot(pls$residuals)
+    plot(RMSEP(pls), legendpos = "topright", main = "RMSEP vs. Faktoren PLS_101")
+  }
+
+  return(pls_metrics)
+}
+
+perform_multiblock_pls_regression <- function(filtered_data_nir, filtered_data_mir) {
+  #### Multiblock PLS
+  multiblock_pls_rds_path <- file.path("temp", "mbpls.RDS")
+  train_time_multiblock <- system.time({
+    multiblock_pls <- run_multiblock_pls(filtered_data_nir, filtered_data_mir, multiblock_pls_rds_path)
+  })[["elapsed"]]
+  msep_multiblock <- multiblock::MSEP(multiblock_pls)
+  adjCV_multiblock  <- msep_multiblock$val[2, , 11]
+  rmsep_multiblock <- sqrt(adjCV_multiblock)
+  r2_multiblock <- R2(multiblock_pls)
+  #plot_pls(multiblock_pls)
+  multiblock_metrics <- list(
+    model = "multiblock_pls",
+    rmse = rmsep_multiblock,
+    r2 = r2_multiblock$val[1, , 11],
+    training_time = train_time_multiblock
+  )
+  return(multiblock_metrics)
 }
