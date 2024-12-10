@@ -29,7 +29,7 @@ run_pls <- function(spectra_df, rds_path) {
   spectra_matrix <- data.matrix(spectra)
   print("pls data")
   print(dim(spectra_matrix))
-  pls_result <- plsr(ref_cotton ~ spectra_matrix, data = spectra_df, ncomp = 10, val = "LOO")
+  pls_result <- plsr(ref_cotton ~ spectra_matrix, data = spectra_df, ncomp = 20, val = "LOO")
   if (!missing(rds_path)) {
     saveRDS(pls_result, rds_path)
   }
@@ -39,17 +39,17 @@ run_pls <- function(spectra_df, rds_path) {
 
 run_multiblock_pls <- function(block1, block2, rds_path) {
   
-  baseline_correction_df_nir_ <- block1 %>%
+  block_df_nir <- block1 %>%
     rename_with(~ paste0("NIR_", .), starts_with("spectra"))
   
-  baseline_correction_df_mir_ <- block2 %>%
+  block_df_mir <- block2 %>%
     rename_with(~ paste0("MIR_", .), starts_with("spectra"))
   
-  baseline_correction_df_nir_$num <- sequence(rle(as.character(baseline_correction_df_nir_$reference.cotton))$lengths)
-  baseline_correction_df_mir_$num <- sequence(rle(as.character(baseline_correction_df_mir_$reference.cotton))$lengths)
+  block_df_nir$num <- sequence(rle(as.character(block_df_nir$reference.cotton))$lengths)
+  block_df_mir$num <- sequence(rle(as.character(block_df_mir$reference.cotton))$lengths)
   
-  joined_data <- inner_join(baseline_correction_df_mir_, baseline_correction_df_nir_, by = c("num", "reference.cotton"))
-  joined_data <- select(joined_data, -c(reference.pet.x, reference.specimen.x, reference.area.x, reference.spot.x, reference.measuring_date.x,
+  joined_data <- inner_join(block_df_mir, block_df_nir, by = c("num", "reference.cotton"))
+  joined_data <- dplyr::select(joined_data, -c(reference.pet.x, reference.specimen.x, reference.area.x, reference.spot.x, reference.measuring_date.x,
                                         reference.pet.y, reference.specimen.y, reference.area.y, reference.spot.y, reference.measuring_date.y,
                                         num))  
   
@@ -60,9 +60,9 @@ run_multiblock_pls <- function(block1, block2, rds_path) {
   print("multiblock data")
   print(dim(joined_data))
   
-  pls_result <- mbpls(X = list(NIR = joined_data %>% select(starts_with("NIR")),
-                               MIR = joined_data %>% select(starts_with("MIR"))),
-                      Y = joined_data %>% select(starts_with("reference.cotton")), ncomp = 10, validation="CV")
+  pls_result <- mbpls(X = list(NIR = joined_data %>% dplyr::select(starts_with("NIR")),
+                               MIR = joined_data %>% dplyr::select(starts_with("MIR"))),
+                      Y = joined_data %>% dplyr::select(starts_with("reference.cotton")), ncomp = 20, validation="CV")
   if (!missing(rds_path)) {
     saveRDS(pls_result, rds_path)
   }
