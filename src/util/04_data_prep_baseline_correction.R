@@ -66,3 +66,12 @@ msc <- function(spectra_df) {
   colnames(msc_df) <- colnames(spectra_df)
   return(msc_df)
 }
+
+# Savitzky-Golay Smoothing
+savitzky_golay <- function(spectra_df, m = 2, p = 3, w = 5) {
+  spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
+  reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
+  spectra_SG <- savitzkyGolay(spectra_matrix, m, p, w)
+  savgol_df <- data.frame(reference_matrix, spectra_SG)
+  return(savgol_df)
+}

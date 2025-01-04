@@ -2,7 +2,7 @@ library(pls)
 library(plotly)
 library(dplyr)
 
-plot_spectra <- function(spectra_df) {
+plot_spectra <- function(spectra_df, lim = c(8000, 4000)) {
   spectra <- spectra_df %>% dplyr::select(starts_with("spectra"))
   
   # Reverse wave numbers (decreasing order of wavenumbers)
@@ -13,7 +13,7 @@ plot_spectra <- function(spectra_df) {
   spectra <- spectra[, rev(seq_along(wave_numbers))]
   
   # Specify xlim so that x axis is also reversed
-  matplot(wave_numbers, t(spectra), lty = 1, type = "l", xlim = c(8000, 4000),
+  matplot(wave_numbers, t(spectra), lty = 1, type = "l", xlim = lim ,
           ylab = "Absorbance (%)", xlab = "Wavenumber (1/cm)")
 }
 
