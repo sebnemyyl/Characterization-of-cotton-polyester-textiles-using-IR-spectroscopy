@@ -16,9 +16,9 @@ def get_baseline_corr_type(csv_file):
     return parts[-1]
 
 print(os.getcwd())
-input_dir = "../../temp/spectra_treated/nir"
-models = ["SVR",  "Kernel Ridge", "XGBoost", "MLP"]
-output_file = "../../temp/nir_model_output.json"
+input_dir = "temp/fixed_test_set_exp/baseline"
+models = ["Kernel Ridge", "SVR", "Random Forest Regressor", "MLP"]
+output_file = "temp/fixed_test_set_exp/model_output_none.json"
 
 
 csv_files = util.get_csv_files(input_dir)
@@ -26,8 +26,9 @@ output = []
 for csv_file in csv_files:
     csv_path = os.path.join(input_dir, csv_file)
     baseline_corr_type = get_baseline_corr_type(csv_file)
-    X, y = model_util.load_feature_set(csv_path)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    #X, y = model_util.load_feature_set(csv_path)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+    X_train, X_test, y_train, y_test = model_util.split_feature_set_with_specimen(csv_path)
     for model in models:
         print(f"Evaluating model {model} for {baseline_corr_type}")
         model_output = model_util.evaluate_model(model, X_train, X_test, y_train, y_test)
@@ -41,8 +42,9 @@ for csv_file in csv_files:
             prediction_time = model_output["prediction_time"],
             best_params = model_output["best_params"],
         )
+        print(result)
         output.append(result)
 
 print(output)
 with open(output_file, "w") as outfile:
-    json.dump(output, outfile)
+    json.dump(output, outfile, indent=4)

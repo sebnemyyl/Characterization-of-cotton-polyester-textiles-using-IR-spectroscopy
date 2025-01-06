@@ -24,17 +24,37 @@ def load_feature_set(csv_file):
     y = data_clean['reference.cotton']
     return (X, y)
 
+def split_feature_set_with_specimen(csv_file):
+    baseline_corrected_data = pd.read_csv(csv_file, sep=',', header=0)
+    # Convert the cotton column to numeric and handle errors
+    baseline_corrected_data['reference.cotton'] = pd.to_numeric(baseline_corrected_data['reference.cotton'], errors='coerce')
+    # Drop rows with missing cotton values
+    data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
+    # Put all measurements of certain specimen into test data set
+    test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
+    training_data = data_clean[~data_clean.isin(test_data)].dropna()  
+    # Prepare the feature set (exclude non-spectral columns)
+    X_test = test_data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
+    X_test.columns = X_test.columns.str.replace('spectra.', '')
+    X_training = training_data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
+    X_training.columns = X_training.columns.str.replace('spectra.', '')
+    # Prepare the target column (cotton content)
+    y_test = test_data['reference.cotton']
+    y_training = training_data['reference.cotton']
+    return (X_training, X_test, y_training, y_test)
+
 
 models = {
-    "SVR": GridSearchCV(
+    "SVR": RandomizedSearchCV(
         SVR(),
-        param_grid={
+        param_distributions={
             'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
             'C': [10, 1, 0.1, 0.01, 0.001],
             'gamma': np.logspace(-2, 2, 5),
             'epsilon': [0.01, 0.1, 0.5, 1.0],
             'degree': [2, 3, 4, 5],
-        }
+        },
+        n_iter=10, random_state=42
     ),
     "Kernel Ridge": RandomizedSearchCV(
         KernelRidge(kernel="rbf"),
@@ -54,14 +74,14 @@ models = {
         n_iter=10, random_state=42
     ),
     "XGBoost": RandomizedSearchCV(
-       XGBRegressor(),
-       param_distributions={
-           "n_estimators": [100, 200, 300],
-           "max_depth": [3, 5, 7],
-           "learning_rate": [0.01, 0.1, 0.2],
-           "subsample": [0.8, 0.9, 1.0]
-       },
-       n_iter=10, random_state=42
+        XGBRegressor(),
+        param_distributions={
+            "n_estimators": [100, 200, 300],
+            "max_depth": [3, 5, 7],
+            "learning_rate": [0.01, 0.1, 0.2],
+            "subsample": [0.8, 0.9, 1.0]
+        },
+        n_iter=10, random_state=42
     ),
     "MLP": RandomizedSearchCV(
         MLPRegressor(max_iter=1000),
