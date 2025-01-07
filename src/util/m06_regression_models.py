@@ -31,7 +31,7 @@ def split_feature_set_with_specimen(csv_file):
     # Drop rows with missing cotton values
     data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
     # Put all measurements of certain specimen into test data set
-    test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
+    test_data = data_clean.loc[data_clean['reference.specimen'] == 3]
     training_data = data_clean[~data_clean.isin(test_data)].dropna()  
     # Prepare the feature set (exclude non-spectral columns)
     X_test = test_data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])

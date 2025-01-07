@@ -13,8 +13,10 @@ type <- "nir"
 
 spectra_df_full <- load_csv(input_path)
 spectra_df_clean <- clean_up_spectra(spectra_df_full, type, remove_waterband = TRUE)
+
 ## Filter as needed (cotton content, date etc)
-#spectra_df_clean <- spectra_df_clean %>% filter(reference.measuring_date == 240827 | reference.measuring_date == 240812 ) # NIR resampling
+#spectra_df_clean <- spectra_df_clean %>% filter(!(reference.cotton == 30 & reference.specimen == 3))
+#spectra_df_clean <- spectra_df_clean %>% filter(!(reference.cotton == 50 & reference.specimen <= 6))
 
 spectra_df_clean$reference.pet<-as.numeric(spectra_df_clean$reference.pet)
 spectra_df_clean$reference.cotton<-as.numeric(spectra_df_clean$reference.cotton)
