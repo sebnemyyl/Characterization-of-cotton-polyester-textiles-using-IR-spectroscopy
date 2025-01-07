@@ -16,9 +16,10 @@ def get_baseline_corr_type(csv_file):
     return parts[-1]
 
 print(os.getcwd())
-input_dir = "../../temp/spectra_treated/nir"
-models = [ "SVR"]
-output_file = "../../temp/spectra_treated/nir/svr_model_output.json"
+input_dir = "temp/balanced_dataset/corr"
+models = ["Kernel Ridge"]
+output_file = "temp/balanced_dataset/svr_model_output.json"
+plot_path = "temp/balanced_dataset/plots"
 
 
 csv_files = util.get_csv_files(input_dir)
@@ -31,7 +32,9 @@ for csv_file in csv_files:
     X_train, X_test, y_train, y_test = model_util.split_feature_set_with_specimen(csv_path)
     for model in models:
         print(f"Evaluating model {model} for {baseline_corr_type}")
-        model_output = model_util.evaluate_model(model, X_train, X_test, y_train, y_test)
+        model_output = model_util.evaluate_model(
+            model, baseline_corr_type, X_train, X_test, y_train, y_test, plot_path
+            )
         result = {}
         result.update(
             model = model,

@@ -10,9 +10,8 @@ import os
 import util.m06_regression_models as model_util
 from sklearn.metrics import r2_score, root_mean_squared_error
 
-
 print(os.getcwd())
-csv_path = "../../temp/spectra_treated/nir/spectra_nir_regression_snv.csv"
+csv_path = "temp/balanced_dataset/corr/spectra_nir_als.csv"
 model_name = "Kernel Ridge"
 #output_file = "../../temp/spectra_treated/nir/kernel_model_output.json"
 
@@ -29,12 +28,7 @@ y_pred = model.predict(X_test)
 r2 = r2_score(y_test, y_pred)
 print(r2)
 
-plt.scatter(y_test, y_pred)
-p1 = max(max(y_pred), max(y_test))
-p2 = min(min(y_pred), min(y_test))
-plt.plot([p1, p2], [p1, p2], 'b-')
-plt.xlabel("Actual")
-plt.ylabel("Predicted")
-#display = PredictionErrorDisplay(y_true=y_test, y_pred=y_pred)
-#display.plot()
+# Training performance
+y_train_pred = model.predict(X_train)
+model_util.create_prediction_plot(y_test, y_pred, y_train, y_train_pred)
 plt.show()

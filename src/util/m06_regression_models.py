@@ -4,12 +4,14 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV, cross_val_score
 from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neural network
 from sklearn.svm import SVR
-from xgboost import XGBRegressor
+#from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
 import pandas as pd
 import numpy as np
 import time
 from sklearn.model_selection import GridSearchCV
+import matplotlib.pyplot as plt
+import os
 
 def load_feature_set(csv_file):
     baseline_corrected_data = pd.read_csv(csv_file, sep=',', header=0)
@@ -31,7 +33,7 @@ def split_feature_set_with_specimen(csv_file):
     # Drop rows with missing cotton values
     data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
     # Put all measurements of certain specimen into test data set
-    test_data = data_clean.loc[data_clean['reference.specimen'] == 3]
+    test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
     training_data = data_clean[~data_clean.isin(test_data)].dropna()  
     # Prepare the feature set (exclude non-spectral columns)
     X_test = test_data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
@@ -73,16 +75,16 @@ models = {
         },
         n_iter=10
     ),
-    "XGBoost": RandomizedSearchCV(
-        XGBRegressor(),
-        param_distributions={
-            "n_estimators": [100, 200, 300],
-            "max_depth": [3, 5, 7],
-            "learning_rate": [0.01, 0.1, 0.2],
-            "subsample": [0.8, 0.9, 1.0]
-        },
-        n_iter=10
-    ),
+    #"XGBoost": RandomizedSearchCV(
+    #    XGBRegressor(),
+    #    param_distributions={
+    #        "n_estimators": [100, 200, 300],
+    #        "max_depth": [3, 5, 7],
+    #        "learning_rate": [0.01, 0.1, 0.2],
+    #        "subsample": [0.8, 0.9, 1.0]
+    #    },
+    #    n_iter=10
+    #),
     "MLP": RandomizedSearchCV(
         MLPRegressor(max_iter=1000),
         param_distributions={
@@ -96,7 +98,7 @@ models = {
 }
 
 
-def evaluate_model(model_name, X_train, X_test, y_train, y_test):
+def evaluate_model(model_name, baseline_corr, X_train, X_test, y_train, y_test, plot_path = ""):
     model = models[model_name]
     # Train the model
     start_time = time.time()
@@ -117,6 +119,14 @@ def evaluate_model(model_name, X_train, X_test, y_train, y_test):
     train_rmse = root_mean_squared_error(y_train, y_train_pred)
     train_r2 = r2_score(y_train, y_train_pred)
 
+    if plot_path != "":
+        file_name = f"{model_name}_{baseline_corr}.png"
+        file_path = os.path.join(plot_path, file_name)
+        title = f"{model_name} for {baseline_corr}"
+        create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title)
+        plt.savefig(file_path)
+        print(f"Saving Plot to {file_path}")
+
     return {
         "model": model,
         "best_params": model.best_params_,
@@ -127,3 +137,14 @@ def evaluate_model(model_name, X_train, X_test, y_train, y_test):
         "train_rmse": train_rmse,
         "train_r2": train_r2
     }
+
+def create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title = "Prediction plot"):
+    test_pred = plt.scatter(y_test, y_pred, marker="x", c='b')
+    train_pred = plt.scatter(y_train, y_train_pred, marker="o", facecolors='none', edgecolors='g')
+    p1 = max(max(y_pred), max(y_test))
+    p2 = min(min(y_pred), min(y_test))
+    plt.plot([p1, p2], [p1, p2], 'k-')
+    plt.legend((train_pred, test_pred), ("Train", "Test"),loc = "lower right")
+    plt.xlabel("Actual")
+    plt.ylabel("Predicted")
+    plt.title(title)
