@@ -63,7 +63,9 @@ def run_jackknife(absorb_val_by_peaks):
         # len(absorb_val_by_peaks) is the number of spots measured
         jackknife_est_var = []
         # Generate all the combinations of given L
-        index_combinations = list(itertools.combinations(np.where(absorb_val_by_peaks)[0], L))
+        index_combinations = list(itertools.combinations(np.where(absorb_val_by_peaks)[0], L)) #np.arrange
+        print(f"the combinations  {np.where(absorb_val_by_peaks)[0]}")
+        print(f"absorb_val_by_peaks {absorb_val_by_peaks}")
         #print(f"{L} has number of index combinations: {len(index_combinations)}")
         for indices_to_leave_out in index_combinations:
             # print(indices_to_leave_out)

@@ -54,7 +54,7 @@ models = {
             'epsilon': [0.01, 0.1, 0.5, 1.0],
             'degree': [2, 3, 4, 5],
         },
-        n_iter=10, random_state=42
+        n_iter=10
     ),
     "Kernel Ridge": RandomizedSearchCV(
         KernelRidge(kernel="rbf"),
@@ -71,7 +71,7 @@ models = {
             "max_features": ["sqrt", "log2", None],
             "bootstrap": [True, False]
         },
-        n_iter=10, random_state=42
+        n_iter=10
     ),
     "XGBoost": RandomizedSearchCV(
         XGBRegressor(),
@@ -81,7 +81,7 @@ models = {
             "learning_rate": [0.01, 0.1, 0.2],
             "subsample": [0.8, 0.9, 1.0]
         },
-        n_iter=10, random_state=42
+        n_iter=10
     ),
     "MLP": RandomizedSearchCV(
         MLPRegressor(max_iter=1000),
@@ -91,7 +91,7 @@ models = {
             'learning_rate_init': [0.001, 0.01, 0.1],
             'activation': ['relu', 'tanh']
         },
-        n_iter=10, random_state=42
+        n_iter=10
     )
 }
 
@@ -112,11 +112,18 @@ def evaluate_model(model_name, X_train, X_test, y_train, y_test):
     rmse = root_mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
+    # Training performance
+    y_train_pred = model.predict(X_train)
+    train_rmse = root_mean_squared_error(y_train, y_train_pred)
+    train_r2 = r2_score(y_train, y_train_pred)
+
     return {
         "model": model,
         "best_params": model.best_params_,
         "training_time": training_time,
         "prediction_time": prediction_time,
-        "rmse": rmse,
-        "r2": r2
+        "test_rmse": rmse,
+        "test_r2": r2,
+        "train_rmse": train_rmse,
+        "train_r2": train_r2
     }

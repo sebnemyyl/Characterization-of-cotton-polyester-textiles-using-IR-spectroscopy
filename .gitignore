@@ -3,3 +3,6 @@
 .DS_Store
 temp/
 *.pyc
+src/.Rhistory
+.idea/
+*.Rhistory
