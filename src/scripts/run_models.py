@@ -16,9 +16,9 @@ def get_baseline_corr_type(csv_file):
     return parts[-1]
 
 print(os.getcwd())
-input_dir = "temp/fixed_test_set_exp/baseline"
-models = ["Kernel Ridge", "SVR", "Random Forest Regressor", "MLP"]
-output_file = "temp/fixed_test_set_exp/model_output_none.json"
+input_dir = "../../temp/spectra_treated/nir"
+models = [ "SVR"]
+output_file = "../../temp/spectra_treated/nir/svr_model_output.json"
 
 
 csv_files = util.get_csv_files(input_dir)
@@ -36,8 +36,10 @@ for csv_file in csv_files:
         result.update(
             model = model,
             baseline_corr = baseline_corr_type,
-            RMSE = model_output["rmse"],
-            R2 = model_output["r2"],
+            Test_RMSE = model_output["test_rmse"],
+            Test_R2 = model_output["test_r2"],
+            Train_RMSE = model_output["train_rmse"],
+            Train_R2 = model_output["train_r2"],
             training_time = model_output["training_time"],
             prediction_time = model_output["prediction_time"],
             best_params = model_output["best_params"],
