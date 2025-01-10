@@ -4,7 +4,9 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV, cross_val_score
 from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neural network
 from sklearn.svm import SVR
-#from xgboost import XGBRegressor
+from sklearn.decomposition import PCA
+from sklearn.cross_decomposition import PLSRegression
+from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
 import pandas as pd
 import numpy as np
@@ -45,10 +47,16 @@ def split_feature_set_with_specimen(csv_file):
     y_training = training_data['reference.cotton']
     return (X_training, X_test, y_training, y_test)
 
+def run_pca(X_train, X_test, n_comps=50):
+    pca = PCA(n_components=n_comps)
+    X_train_pca = pca.fit_transform(X_train)
+    X_test_pca = pca.transform(X_test)
+    return (X_train_pca, X_test_pca)
+
 
 models = {
     "SVR": RandomizedSearchCV(
-        SVR(),
+        SVR(cache_size=7000),
         param_distributions={
             'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
             'C': [10, 1, 0.1, 0.01, 0.001],
@@ -61,9 +69,9 @@ models = {
     "Kernel Ridge": RandomizedSearchCV(
         KernelRidge(kernel="rbf"),
         param_distributions={"alpha": [1e0, 0.1, 1e-2, 1e-3], "gamma": np.logspace(-2, 2, 5)},
-        n_iter=10, random_state=42
+        n_iter=10
     ),
-    "Random Forest Regressor": RandomizedSearchCV(
+    "Random Forest": RandomizedSearchCV(
         RandomForestRegressor(),
         param_distributions={
             "n_estimators": [10, 20, 50, 100, 200, 500],
@@ -75,16 +83,16 @@ models = {
         },
         n_iter=10
     ),
-    #"XGBoost": RandomizedSearchCV(
-    #    XGBRegressor(),
-    #    param_distributions={
-    #        "n_estimators": [100, 200, 300],
-    #        "max_depth": [3, 5, 7],
-    #        "learning_rate": [0.01, 0.1, 0.2],
-    #        "subsample": [0.8, 0.9, 1.0]
-    #    },
-    #    n_iter=10
-    #),
+    "XGBoost": RandomizedSearchCV(
+         XGBRegressor(),
+         param_distributions={
+             "n_estimators": [100, 200, 300],
+             "max_depth": [3, 5, 7],
+             "learning_rate": [0.01, 0.1, 0.2],
+             "subsample": [0.8, 0.9, 1.0]
+         },
+         n_iter=10
+    ),
     "MLP": RandomizedSearchCV(
         MLPRegressor(max_iter=1000),
         param_distributions={
@@ -94,7 +102,14 @@ models = {
             'activation': ['relu', 'tanh']
         },
         n_iter=10
-    )
+    ),
+    "PLS": RandomizedSearchCV(
+        PLSRegression(),
+        param_distributions={
+            'n_components': range(5, 200, 5)
+        },
+        n_iter=10
+    ),
 }
 
 

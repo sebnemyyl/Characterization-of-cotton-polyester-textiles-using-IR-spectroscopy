@@ -17,8 +17,8 @@ def get_baseline_corr_type(csv_file):
 
 print(os.getcwd())
 input_dir = "temp/balanced_dataset/corr"
-models = ["Kernel Ridge"]
-output_file = "temp/balanced_dataset/svr_model_output.json"
+models = ["PLS"]
+output_file = "temp/balanced_dataset/model_output_balanced_scaling.json"
 plot_path = "temp/balanced_dataset/plots"
 
 
@@ -30,6 +30,8 @@ for csv_file in csv_files:
     #X, y = model_util.load_feature_set(csv_path)
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
     X_train, X_test, y_train, y_test = model_util.split_feature_set_with_specimen(csv_path)
+    # Run PCA 
+    #X_train, X_test = model_util.run_pca(X_train, X_test)
     for model in models:
         print(f"Evaluating model {model} for {baseline_corr_type}")
         model_output = model_util.evaluate_model(
@@ -49,6 +51,8 @@ for csv_file in csv_files:
         )
         print(result)
         output.append(result)
+        with open(output_file, "w") as outfile:
+            json.dump(output, outfile, indent=4)
 
 print(output)
 with open(output_file, "w") as outfile:
