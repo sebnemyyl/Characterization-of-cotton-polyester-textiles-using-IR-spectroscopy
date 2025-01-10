@@ -29,7 +29,7 @@ detrend <- function(spectra_df, polynomial_order) {
 
 
 # Asymmetric Least Squares
-als <- function(spectra_df, lambda_als = 3, p_als = 0.05, maxit_als = 20) {
+als <- function(spectra_df, lambda_als = 2, p_als = 0.05, maxit_als = 20) {
   spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
   reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
   spectra_als <- baseline.als(spectra = spectra_matrix, 
@@ -68,7 +68,7 @@ msc <- function(spectra_df) {
 }
 
 # Savitzky-Golay Smoothing
-savitzky_golay <- function(spectra_df, m = 2, p = 3, w = 5) {
+savitzky_golay <- function(spectra_df, m = 1, p = 2, w = 5) {
   spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
   reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
   spectra_SG <- savitzkyGolay(spectra_matrix, m, p, w)
