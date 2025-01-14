@@ -14,7 +14,7 @@ print(os.getcwd())
 
 input_dir = "../input/clean_csv/resampling"
 output_dir = "../input"
-csv_files = util.get_csv_files(input_dir)
+csv_files = util.get_files(input_dir)
 for file in csv_files:
     csv_file = os.path.join(input_dir, file)
     print(csv_file)

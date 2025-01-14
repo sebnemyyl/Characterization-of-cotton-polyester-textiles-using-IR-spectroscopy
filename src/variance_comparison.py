@@ -6,7 +6,7 @@ import os
 import matplotlib.pyplot as plt
 
 print(os.getcwd())
-my_path = "../temp/40"
+my_path = "../temp/50"
 
 variance_dic = {}
 rsd_dic = {}

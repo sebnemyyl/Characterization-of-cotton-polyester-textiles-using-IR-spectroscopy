@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 print(os.getcwd())
 my_path = "../temp/jackknife"
-os.chdir("")
+#os.chdir("")
 
 def get_csv_files(path):
     files_in_path = os.listdir(path)

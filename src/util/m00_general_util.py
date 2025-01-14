@@ -2,9 +2,9 @@ import os
 import numpy as np
 import json
 
-def get_csv_files(path):
+def get_files(path, endswith = ".csv"):
     files_in_path = os.listdir(path)
-    csv_files = filter(lambda f: f.endswith(".csv"), files_in_path)
+    csv_files = filter(lambda f: f.endswith(endswith), files_in_path)
     return list(csv_files)
 
 def merge_json_files(json_files, output_file = "combined.json"):

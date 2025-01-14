@@ -5,18 +5,22 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 from scipy import stats
 import importlib.util
+import pickle
+import util.m00_general_util as util
+from scipy import stats
+# resample = importlib.util.spec_from_file_location("resampling_methods", "util\\05_jackknife_bootstrap_resampling.py")
+# resampling_methods = importlib.util.module_from_spec(resample)
+# resample.loader.exec_module(resampling_methods)
 
-resample = importlib.util.spec_from_file_location("resampling_methods", "util\\05_jackknife_bootstrap_resampling.py")
-resampling_methods = importlib.util.module_from_spec(resample)
-resample.loader.exec_module(resampling_methods)
+#my_path = "../temp/all"
 
-my_path = "../temp/all"
+pkl_path = f'../temp/bootstrap/bootstrap_spectra_treated_snv_50_cotton_nir.csv.pkl'
+loaded_dict = pickle.load(open(pkl_path,"rb"))
 
 # Dictionary to store the minimum sample size where p-value crosses 0.05 for each file and wavenumber
 crossing_sample_size_by_file_and_wavenumber = defaultdict(list)
 
 
-# Function to detect minimum sample size where p-value crosses 0.05
 def detect_pvalue_crossing(final_dict):
     p_values_by_spectrum_and_sample_size = defaultdict(lambda: defaultdict(list))
     averaged_p_values_by_spectrum_and_sample_size = defaultdict(dict)
@@ -24,14 +28,13 @@ def detect_pvalue_crossing(final_dict):
     for spectra, specimen_sample_size in final_dict.items():
         for specimen, bootstrap in specimen_sample_size.items():
             baseline_data = bootstrap[19]
+
             for sample_size in range(2, 19):
                 current_data = bootstrap[sample_size]
                 F_statistic, p_value = stats.f_oneway(current_data, baseline_data)
                 #statistic = alexandergovern(current_data, baseline_data)
                 p_values_by_spectrum_and_sample_size[spectra][sample_size].append(p_value)
                 #p_values_by_spectrum_and_sample_size[spectra][sample_size].append(statistic.pvalue)
-
-
 
     for spectra, sample_size_dict in p_values_by_spectrum_and_sample_size.items():
         for sample_size, pval_list in sample_size_dict.items():
@@ -41,39 +44,24 @@ def detect_pvalue_crossing(final_dict):
     return averaged_p_values_by_spectrum_and_sample_size
 
 
-for r, d, f in os.walk(my_path):
-    for file in f:
-        if file.endswith(".csv"):
-            print(f"Processing file: {file}")
 
-            # Load the data (adjust this path if needed)
-            data = pd.read_csv(os.path.join(r, file), sep=',', header=0)
-            related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
-            related_data = related_data.drop(['reference.pet', 'reference.cotton', 'reference.area',
-                                              'reference.spot', 'reference.measuring_date', 'Unnamed: 0'], axis=1)
-            specimens = related_data[related_data.columns[0]]
+input_dir = "../temp/bootstrap"
+output_dir = "../temp/bootstrap"
+pkl_files = util.get_files(input_dir, endswith=".pkl")
+for file in pkl_files:
+    pkl_file_path = os.path.join(input_dir, file)
+    print(file)
+    loaded_dict = pickle.load(open(pkl_file_path, "rb"))
+    # Detect the **minimum** sample size where p-value crosses 0.05
+    averaged_p_values = detect_pvalue_crossing(loaded_dict)
+    threshold = 0.05
+    for spectra, specimen_p_value in averaged_p_values.items():
+        for sample_size, avg_p_value in specimen_p_value.items():
+            if avg_p_value > threshold:
+                # Collect the **minimum** sample size and stop for this wavenumber
+                crossing_sample_size_by_file_and_wavenumber["file"].append((sample_size, spectra))
+                break  # Stop after finding the first sample size that exceeds 0.05
 
-            (sorted_peak_indices, key_wavenumbers) = resampling_methods.find_key_wavenumbers(related_data)
-            result_series = resampling_methods.get_spectra_from_key_wavenumbers(related_data, key_wavenumbers)
-            final_dict = {}
-
-            for wn_index, wn in enumerate(key_wavenumbers):
-                bootstrap_by_specimen_agg = {}
-                for specimen in result_series.keys():
-                    absorb_val_by_peaks = result_series.get(specimen)[wn_index][:]
-                    bootstrap_by_specimen = resampling_methods.run_bootstrap(absorb_val_by_peaks)
-                    bootstrap_by_specimen_agg[specimen] = bootstrap_by_specimen
-                final_dict[wn] = bootstrap_by_specimen_agg
-
-            # Detect the **minimum** sample size where p-value crosses 0.05
-            averaged_p_values = detect_pvalue_crossing(final_dict)
-            threshold = 0.05
-            for spectra, specimen_p_value in averaged_p_values.items():
-                for sample_size, avg_p_value in specimen_p_value.items():
-                    if avg_p_value > threshold:
-                        # Collect the **minimum** sample size and stop for this wavenumber
-                        crossing_sample_size_by_file_and_wavenumber[file].append((sample_size, spectra))
-                        break  # Stop after finding the first sample size that exceeds 0.05
 
 # Prepare data for scatter plot
 file_names = []
