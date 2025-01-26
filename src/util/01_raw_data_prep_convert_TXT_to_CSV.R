@@ -6,7 +6,7 @@
 #######################
 
 # Before using script:
-#### use Converter-FolderFiles.mtb file and anleitung N:\Spektroskopie\Geräte\RAMAN\Bedienung\ExportOpus_alsTxt.file_V001.docx
+#### use Converter-FolderFiles.mtb file and anleitung N:\Spektroskopie\GerC$te\RAMAN\Bedienung\ExportOpus_alsTxt.file_V001.docx
 #### to convert OPUS files to several TXT files
 
 load_txt_files <- function(file_name, dir) {
@@ -59,8 +59,7 @@ convert_txt_to_dataframe <- function(dir) {
   return(spectra)
 }
 
-
-#spectra <- convert_txt_to_dataframe(dir = "input/clean_txt/NIR")
+setwd('C:/Users/sebne/OneDrive/Documents/FHWN_Tulln/DataAnalysis/repo')
+spectra <- convert_txt_to_dataframe(dir = "input/renamed_txt/NIR")
 #write to csv file
-#write.csv2(spectra, "spectra_nir_240827.csv", row.names = TRUE)
-#setwd('C:/Users/sebne/Documents/FHWN_Tulln/DataAnalysis/repo/src')
+write.csv2(spectra, "spectra_nir_250124.csv", row.names = TRUE)
