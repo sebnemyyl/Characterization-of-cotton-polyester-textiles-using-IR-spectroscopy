@@ -22,7 +22,7 @@ output_file = "temp/balanced_dataset/model_output_balanced_scaling.json"
 plot_path = "temp/balanced_dataset/plots"
 
 
-csv_files = util.get_csv_files(input_dir)
+csv_files = util.get_files(input_dir)
 output = []
 for csv_file in csv_files:
     csv_path = os.path.join(input_dir, csv_file)
@@ -31,7 +31,7 @@ for csv_file in csv_files:
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
     X_train, X_test, y_train, y_test = model_util.split_feature_set_with_specimen(csv_path)
     # Run PCA 
-    #X_train, X_test = model_util.run_pca(X_train, X_test)
+    #X_train, X_test = model_util.run_pca(X_train, X_test)    
     for model in models:
         print(f"Evaluating model {model} for {baseline_corr_type}")
         model_output = model_util.evaluate_model(

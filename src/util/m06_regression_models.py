@@ -1,6 +1,6 @@
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import r2_score, root_mean_squared_error
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, KFold
 from sklearn.model_selection import RandomizedSearchCV, cross_val_score
 from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neural network
 from sklearn.svm import SVR
@@ -64,12 +64,15 @@ models = {
             'epsilon': [0.01, 0.1, 0.5, 1.0],
             'degree': [2, 3, 4, 5],
         },
-        n_iter=10
+        n_iter=10,
+        cv=KFold(5, shuffle = True)
     ),
     "Kernel Ridge": RandomizedSearchCV(
         KernelRidge(kernel="rbf"),
+        scoring="r2",
         param_distributions={"alpha": [1e0, 0.1, 1e-2, 1e-3], "gamma": np.logspace(-2, 2, 5)},
-        n_iter=10
+        n_iter=10,
+        cv=KFold(5, shuffle = True)
     ),
     "Random Forest": RandomizedSearchCV(
         RandomForestRegressor(),
@@ -81,7 +84,8 @@ models = {
             "max_features": ["sqrt", "log2", None],
             "bootstrap": [True, False]
         },
-        n_iter=10
+        n_iter=10,
+        cv=KFold(5, shuffle = True)
     ),
     "XGBoost": RandomizedSearchCV(
          XGBRegressor(),
@@ -91,7 +95,8 @@ models = {
              "learning_rate": [0.01, 0.1, 0.2],
              "subsample": [0.8, 0.9, 1.0]
          },
-         n_iter=10
+         n_iter=10,
+         cv=KFold(5, shuffle = True)
     ),
     "MLP": RandomizedSearchCV(
         MLPRegressor(max_iter=1000),
@@ -101,14 +106,16 @@ models = {
             'learning_rate_init': [0.001, 0.01, 0.1],
             'activation': ['relu', 'tanh']
         },
-        n_iter=10
+        n_iter=10,
+        cv=KFold(5, shuffle = True)
     ),
     "PLS": RandomizedSearchCV(
         PLSRegression(),
         param_distributions={
             'n_components': range(5, 200, 5)
         },
-        n_iter=10
+        n_iter=10,  
+        cv=KFold(5, shuffle = True)
     ),
 }
 
@@ -119,6 +126,9 @@ def evaluate_model(model_name, baseline_corr, X_train, X_test, y_train, y_test, 
     start_time = time.time()
     model.fit(X_train, y_train)
     training_time = time.time() - start_time
+    cv_res = model.cv_results_
+    cv_results = pd.DataFrame(model.cv_results_)[['mean_test_score', 'std_test_score', 'rank_test_score']]
+    print(cv_results)
 
     # Predict
     start_time = time.time()
