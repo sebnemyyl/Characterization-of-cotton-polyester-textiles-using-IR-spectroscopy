@@ -3,7 +3,6 @@ import sys
 sys.path.insert(0, "src")
 sys.path.insert(0, "..")
 
-from sklearn.model_selection import train_test_split
 
 import os
 import json
@@ -17,7 +16,7 @@ def get_baseline_corr_type(csv_file):
 
 print(os.getcwd())
 input_dir = "temp/balanced_dataset/corr"
-models = ["PLS"]
+models = ["Kernel Ridge"]
 output_file = "temp/balanced_dataset/model_output_balanced_scaling.json"
 plot_path = "temp/balanced_dataset/plots"
 
@@ -27,15 +26,15 @@ output = []
 for csv_file in csv_files:
     csv_path = os.path.join(input_dir, csv_file)
     baseline_corr_type = get_baseline_corr_type(csv_file)
-    #X, y = model_util.load_feature_set(csv_path)
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
-    X_train, X_test, y_train, y_test = model_util.split_feature_set_with_specimen(csv_path)
+    data = model_util.load_feature_set_from_csv(csv_path)
+    X_train, X_test, y_train, y_test, groups_train = model_util.split_feature_set_randomly(data)
+    #X_train, X_test, y_train, y_test, groups_train = model_util.split_feature_set_with_specimen(data)
     # Run PCA 
-    #X_train, X_test = model_util.run_pca(X_train, X_test)    
+    X_train, X_test = model_util.run_pca(X_train, X_test)    
     for model in models:
         print(f"Evaluating model {model} for {baseline_corr_type}")
         model_output = model_util.evaluate_model(
-            model, baseline_corr_type, X_train, X_test, y_train, y_test, plot_path
+            model, baseline_corr_type, X_train, X_test, y_train, y_test, plot_path, groups_train
             )
         result = {}
         result.update(

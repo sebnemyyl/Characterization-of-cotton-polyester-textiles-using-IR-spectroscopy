@@ -1,7 +1,7 @@
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import r2_score, root_mean_squared_error
-from sklearn.model_selection import GridSearchCV, KFold
-from sklearn.model_selection import RandomizedSearchCV, cross_val_score
+from sklearn.model_selection import GridSearchCV, KFold, GroupKFold
+from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neural network
 from sklearn.svm import SVR
 from sklearn.decomposition import PCA
@@ -12,48 +12,61 @@ from sklearn.neighbors import KNeighborsRegressor
 import pandas as pd
 import numpy as np
 import time
-from sklearn.model_selection import GridSearchCV
 import matplotlib.pyplot as plt
 import os
 
-def load_feature_set(csv_file):
+import numpy as np
+
+def load_feature_set_from_csv(csv_file):
     baseline_corrected_data = pd.read_csv(csv_file, sep=',', header=0)
     # Convert the cotton column to numeric and handle errors
     baseline_corrected_data['reference.cotton'] = pd.to_numeric(baseline_corrected_data['reference.cotton'], errors='coerce')
     # Drop rows with missing cotton values
     data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
-    # Prepare the feature set (exclude non-spectral columns)
-    X = data_clean.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
+    return data_clean
+ 
+# Prepare the feature set (exclude non-spectral columns) and
+# remove spectra from column name
+def get_X(data):
+    X = data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
     X.columns = X.columns.str.replace('spectra.', '')
+    return X
+
+# Creates group list (combines cotton and specimen for unique specimen id)
+def get_groups(data):
+    groups = data['reference.cotton'] * 100000 + data['reference.specimen']
+    unique_groups = np.unique(groups)
+    print(f"Data set has {len(unique_groups)} number of unique specimen: {unique_groups}")
+    return groups
+
+def split_feature_set_randomly(data_clean):
+    # Prepare the feature set (exclude non-spectral columns)
     # Prepare the target column (cotton content)
     y = data_clean['reference.cotton']
-    return (X, y)
+    X_train, X_test, y_train, y_test = train_test_split(data_clean, y, test_size=0.25)
+    groups_train = get_groups(X_train)
+    X_train = get_X(X_train)
+    X_test = get_X(X_test)
+    return (X_train, X_test, y_train, y_test, groups_train)
 
-def split_feature_set_with_specimen(csv_file):
-    baseline_corrected_data = pd.read_csv(csv_file, sep=',', header=0)
-    # Convert the cotton column to numeric and handle errors
-    baseline_corrected_data['reference.cotton'] = pd.to_numeric(baseline_corrected_data['reference.cotton'], errors='coerce')
-    # Drop rows with missing cotton values
-    data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
+def split_feature_set_with_specimen(data_clean):
     # Put all measurements of certain specimen into test data set
     test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
+    X_test = get_X(test_data)
     training_data = data_clean[~data_clean.isin(test_data)].dropna()  
-    # Prepare the feature set (exclude non-spectral columns)
-    X_test = test_data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
-    X_test.columns = X_test.columns.str.replace('spectra.', '')
-    X_training = training_data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
-    X_training.columns = X_training.columns.str.replace('spectra.', '')
+    groups_train = get_groups(training_data)
+    X_train = get_X(training_data)
+
     # Prepare the target column (cotton content)
     y_test = test_data['reference.cotton']
-    y_training = training_data['reference.cotton']
-    return (X_training, X_test, y_training, y_test)
+    y_train = training_data['reference.cotton']
+    return (X_train, X_test, y_train, y_test, groups_train)
 
 def run_pca(X_train, X_test, n_comps=50):
     pca = PCA(n_components=n_comps)
     X_train_pca = pca.fit_transform(X_train)
     X_test_pca = pca.transform(X_test)
     return (X_train_pca, X_test_pca)
-
 
 models = {
     "SVR": RandomizedSearchCV(
@@ -73,7 +86,7 @@ models = {
         scoring="r2",
         param_distributions={"alpha": [1e0, 0.1, 1e-2, 1e-3], "gamma": np.logspace(-2, 2, 5)},
         n_iter=10,
-        cv=KFold(5, shuffle = True)
+        cv=GroupKFold(n_splits=4, shuffle=True)
     ),
     "Random Forest": RandomizedSearchCV(
         RandomForestRegressor(),
@@ -116,7 +129,7 @@ models = {
             'n_components': range(5, 200, 5)
         },
         n_iter=10,  
-        cv=KFold(5, shuffle = True)
+        cv=KFold(n_splits=5, shuffle = True)
     ),
     "KNN": RandomizedSearchCV(
         KNeighborsRegressor(),
@@ -132,14 +145,14 @@ models = {
 }
 
 
-def evaluate_model(model_name, baseline_corr, X_train, X_test, y_train, y_test, plot_path = ""):
+def evaluate_model(model_name, baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
     model = models[model_name]
     # Train the model
     start_time = time.time()
-    model.fit(X_train, y_train)
+    model.fit(X_train, y_train, groups = groups_train)
     training_time = time.time() - start_time
     cv_res = model.cv_results_
-    cv_results = pd.DataFrame(model.cv_results_)[['mean_test_score', 'std_test_score', 'rank_test_score']]
+    cv_results = pd.DataFrame(cv_res)[['mean_test_score', 'std_test_score', 'rank_test_score']]
     print(cv_results)
 
     # Predict
