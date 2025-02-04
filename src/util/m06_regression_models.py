@@ -8,6 +8,7 @@ from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import PLSRegression
 from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.neighbors import KNeighborsRegressor
 import pandas as pd
 import numpy as np
 import time
@@ -116,6 +117,17 @@ models = {
         },
         n_iter=10,  
         cv=KFold(5, shuffle = True)
+    ),
+    "KNN": RandomizedSearchCV(
+        KNeighborsRegressor(),
+        param_distributions={
+            'n_neighbors': [3, 5, 10, 15, 20],
+            'weights': ['uniform', 'distance'],
+            'metric': ['euclidean', 'manhattan', 'minkowski'],
+            'p': [1, 2]  # For 'minkowski' metric, where p=1 is Manhattan and p=2 is Euclidean
+        },
+        n_iter=10,
+        cv=KFold(5, shuffle=True)
     ),
 }
 
