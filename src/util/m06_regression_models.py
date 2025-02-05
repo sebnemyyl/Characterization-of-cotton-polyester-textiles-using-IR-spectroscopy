@@ -51,7 +51,7 @@ def split_feature_set_randomly(data_clean):
 
 def split_feature_set_with_specimen(data_clean):
     # Put all measurements of certain specimen into test data set
-    test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
+    test_data = data_clean.loc[data_clean['reference.specimen'] == 3]
     X_test = get_X(test_data)
     training_data = data_clean[~data_clean.isin(test_data)].dropna()  
     groups_train = get_groups(training_data)
@@ -68,6 +68,9 @@ def run_pca(X_train, X_test, n_comps=50):
     X_test_pca = pca.transform(X_test)
     return (X_train_pca, X_test_pca)
 
+default_n_iter = 10
+default_cv = GroupKFold(n_splits=5, shuffle=True)
+
 models = {
     "SVR": RandomizedSearchCV(
         SVR(cache_size=7000),
@@ -78,15 +81,15 @@ models = {
             'epsilon': [0.01, 0.1, 0.5, 1.0],
             'degree': [2, 3, 4, 5],
         },
-        n_iter=10,
-        cv=KFold(5, shuffle = True)
+        n_iter=default_n_iter,
+        cv=default_cv
     ),
     "Kernel Ridge": RandomizedSearchCV(
         KernelRidge(kernel="rbf"),
         scoring="r2",
         param_distributions={"alpha": [1e0, 0.1, 1e-2, 1e-3], "gamma": np.logspace(-2, 2, 5)},
-        n_iter=10,
-        cv=GroupKFold(n_splits=4, shuffle=True)
+        n_iter=default_n_iter,
+        cv=default_cv
     ),
     "Random Forest": RandomizedSearchCV(
         RandomForestRegressor(),
@@ -98,8 +101,8 @@ models = {
             "max_features": ["sqrt", "log2", None],
             "bootstrap": [True, False]
         },
-        n_iter=10,
-        cv=KFold(5, shuffle = True)
+        n_iter=default_n_iter,
+        cv=default_cv
     ),
     "XGBoost": RandomizedSearchCV(
          XGBRegressor(),
@@ -109,8 +112,8 @@ models = {
              "learning_rate": [0.01, 0.1, 0.2],
              "subsample": [0.8, 0.9, 1.0]
          },
-         n_iter=10,
-         cv=KFold(5, shuffle = True)
+         n_iter=default_n_iter,
+         cv=default_cv
     ),
     "MLP": RandomizedSearchCV(
         MLPRegressor(max_iter=1000),
@@ -120,16 +123,16 @@ models = {
             'learning_rate_init': [0.001, 0.01, 0.1],
             'activation': ['relu', 'tanh']
         },
-        n_iter=10,
-        cv=KFold(5, shuffle = True)
+        n_iter=default_n_iter,
+        cv=default_cv
     ),
     "PLS": RandomizedSearchCV(
         PLSRegression(),
         param_distributions={
             'n_components': range(5, 200, 5)
         },
-        n_iter=10,  
-        cv=KFold(n_splits=5, shuffle = True)
+        n_iter=default_n_iter,
+        cv=default_cv
     ),
     "KNN": RandomizedSearchCV(
         KNeighborsRegressor(),
@@ -139,8 +142,8 @@ models = {
             'metric': ['euclidean', 'manhattan', 'minkowski'],
             'p': [1, 2]  # For 'minkowski' metric, where p=1 is Manhattan and p=2 is Euclidean
         },
-        n_iter=10,
-        cv=KFold(5, shuffle=True)
+        n_iter=default_n_iter,
+        cv=default_cv
     ),
 }
 
