@@ -1,0 +1,89 @@
+---
+title: "Baseline_correction_plots"
+output: 
+  html_document:
+    keep_md: yes
+
+date: "2025-01-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r load data}
+library(stringr)
+#setwd("C:/Users/sebne/OneDrive/Documents/FHWN_Tulln/DataAnalysis/repo")
+source("../util/02_data_prep_load_CSV.R")
+source("../util/03_data_prep_limit_spectra.R")
+source("../util/05_data_analysis_plot_spectra.R")
+source("../util/04_data_prep_baseline_correction.R")
+
+input_path <- "../../input/raw_csv/spectra_nir_241011.csv"
+output_path <- "../../input/clean_csv/nir_50_reproducibility.csv"
+type <- "nir"
+
+spectra_df_full <- load_csv(input_path)
+spectra_df_clean <- clean_up_spectra(spectra_df_full, type, remove_waterband = FALSE)
+
+## Filter as needed (cotton content, date etc)
+spectra_df_clean <- spectra_df_clean %>% filter(reference.cotton == 25 )
+
+spectra_df_clean$reference.pet<-as.numeric(spectra_df_clean$reference.pet)
+spectra_df_clean$reference.cotton<-as.numeric(spectra_df_clean$reference.cotton)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot_spectra(spectra_df_clean)
+```
+
+```{r}
+# Before running script always set the work directory to top-level of the repository.
+#setwd(".")
+
+
+save_csv_with_baseline_corr <- function(spectra_df_clean, baseline_corr = "snv") {
+  if (baseline_corr == "snv") {
+    baseline_correction_df <- stdnormalvariate(spectra_df_clean)
+  } else if (baseline_corr == "detrend") {
+    baseline_correction_df <- detrend(spectra_df_clean, 3)
+  } else if (baseline_corr == "als") {
+    baseline_correction_df <- als(spectra_df_clean, lambda_als = 6, p_als = 0.05, maxit_als = 20)
+  } else if (baseline_corr == "fillpeaks") {
+    baseline_correction_df <- fillpeaks(spectra_df_clean, lambda_fp = 1, hwi_fp = 10 , it_fp = 6, int_fp = 200)
+  } else if (baseline_corr == "msc") {
+    baseline_correction_df <- msc(spectra_df_clean)
+  } else if (baseline_corr == "savgol") {
+    baseline_correction_df <- savitzky_golay(spectra_df_clean, m = 0, p = 3, w = 21)
+    # m=differentiation order, p= polynomial order, w= window size
+  } else {
+    stop(str_glue("Baseline correction type {baseline_corr} not supported!"))
+  }
+  }
+
+
+
+```
+
+```{r}
+
+baseline_corr_types <- list( "snv","savgol")
+for (baseline_corr in baseline_corr_types) {
+  print(baseline_corr)
+  baseline_correction_df <- save_csv_with_baseline_corr(spectra_df_clean, baseline_corr)
+  plot_spectra(baseline_correction_df)
+}
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
