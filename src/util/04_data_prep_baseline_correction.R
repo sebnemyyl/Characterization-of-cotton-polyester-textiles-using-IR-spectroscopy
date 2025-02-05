@@ -18,7 +18,7 @@ stdnormalvariate <- function(spectra_df) {
 
 
 # prospectr Detrend
-detrend <- function(spectra_df, polynomial_order) {
+detrend <- function(spectra_df, polynomial_order = 3) {
   spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
   reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
   wavenumbers <- as.numeric(sub("spectra.", "", colnames(spectra_matrix)))
@@ -68,7 +68,7 @@ msc <- function(spectra_df) {
 }
 
 # Savitzky-Golay Smoothing
-savitzky_golay <- function(spectra_df, m = 0, p = 3, w =31) {
+savitzky_golay <- function(spectra_df, m = 0, p = 3, w =21) {
   spectra_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("spectra")))
   reference_matrix <- data.matrix(spectra_df %>% dplyr::select(starts_with("reference")))
   spectra_SG <- savitzkyGolay(spectra_matrix, m, p, w)
