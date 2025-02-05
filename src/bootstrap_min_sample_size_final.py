@@ -10,15 +10,15 @@ import importlib.util
 # spec = importlib.util.spec_from_file_location("plot_p_values", "util\\05_data_analysis_plot_jackknife.py")
 # plot_p_val = importlib.util.module_from_spec(spec)
 from scipy.signal import find_peaks
-
+import re
 
 print(os.getcwd())
-my_path = "../temp/reproducibility/bsn_corr"
+my_path = "../temp/reproducibility/new/snv"
 
 variance_dic = {}
 rsd_dic = {}
 
-def find_key_wavenumbers(related_data, top_n_peaks=20):
+def find_key_wavenumbers(related_data, top_n_peaks=10):
     # Calculate the mean spectrum to identify peaks
     mean_spectrum = related_data.mean(axis=0)
 
@@ -33,6 +33,7 @@ def find_key_wavenumbers(related_data, top_n_peaks=20):
 
     # The peaks sorted by height
     top_n_peaks_sorted_by_height = top_n_peaks[np.argsort(peak_heights[sorted_peak_indices])[::-1]]
+    print(top_n_peaks_sorted_by_height)
     key_wavenumbers = related_data.columns[top_n_peaks_sorted_by_height].astype(str).tolist()
     return sorted_peak_indices, key_wavenumbers
 
@@ -53,7 +54,7 @@ def get_spectra_from_key_wavenumbers(data, key_wavenumbers):
     result_series = pd.Series([transposed_array[i] for i in range(transposed_array.shape[0])], index=original_keys)
     return result_series
 
-def bootstrap_resampling(data, n_iterations=100, sample_size = 20):
+def bootstrap_resampling(data, n_iterations=1000, sample_size = 30):
     bootstrap_samples = np.random.choice(data, (n_iterations, sample_size), replace=True)
     means = np.mean(bootstrap_samples, axis=1)
     return means
@@ -61,7 +62,7 @@ def bootstrap_resampling(data, n_iterations=100, sample_size = 20):
 
 def run_bootstrap(absorb_val_by_peaks):
     full_data_mean = np.mean(absorb_val_by_peaks)
-    max_resample_size = 20
+    max_resample_size = 30
     bootstrap_by_specimen = {}  # to be refreshed each specimen and collect avg variance
     for L in range(2, max_resample_size):
         # len(absorb_val_by_peaks) is the number of spots measured
@@ -80,107 +81,104 @@ def run_bootstrap(absorb_val_by_peaks):
 
 #acceptable_margin_of_error = 0.05
 
-final_dict = {}
-# r=root, d=directories, f = files
-for r, d, f in os.walk(my_path):
-    for file in f:
-        if file.endswith(".csv"):
-            print(file)
-            # Load the data
-            data = pd.read_csv(f'../temp/reproducibility/bsn_corr/{file}', sep=',', header=0)
-            related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
-            related_data = related_data.drop(['reference.pet', 'reference.cotton','reference.area','reference.spot','reference.measuring_date','Unnamed: 0'], axis=1)
+# Initialize an empty list to store all final_dict iterations
+all_final_dicts = []
 
-            specimens = related_data[related_data.columns[0]]
-            (sorted_peak_indices, key_wavenumbers) = find_key_wavenumbers(related_data)
-            result_series = get_spectra_from_key_wavenumbers(related_data, key_wavenumbers)
+# Repeat the process 100 times
+for iteration in range(100):
+    final_dict = {}
+    for r, d, f in os.walk(my_path):
+        for file in f:
+            if file.endswith(".csv"):
+                print(f"Iteration {iteration}, processing file: {file}")
+                # Load the data
+                data = pd.read_csv(f'../temp/reproducibility/new/snv/{file}', sep=',', header=0)
+                related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
+                related_data = related_data.drop(
+                    ['reference.pet', 'reference.cotton', 'reference.area', 'reference.spot',
+                     'reference.measuring_date', 'Unnamed: 0'], axis=1)
 
+                specimens = related_data[related_data.columns[0]]
+                (sorted_peak_indices, key_wavenumbers) = find_key_wavenumbers(related_data)
+                result_series = get_spectra_from_key_wavenumbers(related_data, key_wavenumbers)
 
-            for wn_index, wn in enumerate(key_wavenumbers):
-                print(f"wn: {wn}")
-                #jackknife_by_specimen_agg = {}
-                bootstrap_by_specimen_agg = {}
+                for wn_index, wn in enumerate(key_wavenumbers):
+                    bootstrap_by_specimen_agg = {}
 
-                for specimen in result_series.keys():
-                    absorb_val_by_peaks = result_series.get(specimen)[wn_index][:]
+                    for specimen in result_series.keys():
+                        absorb_val_by_peaks = result_series.get(specimen)[wn_index][:]
+                        bootstrap_by_specimen = run_bootstrap(absorb_val_by_peaks)
+                        bootstrap_by_specimen_agg[specimen] = bootstrap_by_specimen
 
-                    Z = 1.96  # Z-score for 95% confidence level
-                    E = 0.005  # Margin of error
-                    absorb_val_by_peaks_stdev = np.std(absorb_val_by_peaks, axis=0)
-                    # Function to calculate required spots
-                    approximate_required_spots = int(np.square((Z * absorb_val_by_peaks_stdev) / E))
-                    print(f' approximate sample size: {approximate_required_spots}')
+                    final_dict[(file, wn)] = {'bootstrap_by_specimen': bootstrap_by_specimen_agg}
 
-                    bootstrap_by_specimen = run_bootstrap(absorb_val_by_peaks)
-                    bootstrap_by_specimen_agg[specimen] = bootstrap_by_specimen
-                final_dict[(file, wn)] = {'bootstrap_by_specimen': bootstrap_by_specimen_agg}
+    all_final_dicts.append(final_dict)
 
-
-
-# Initialize defaultdict for averaged sample size
+# Aggregate the results
 averaged_sample_size = defaultdict(dict)
 
-# Iterate over the final_dict
-for (file, spectra), specimen_data in final_dict.items():
-    bootstrap_by_specimen_agg = specimen_data['bootstrap_by_specimen']
+# Iterate over all final_dicts and compute the average
+for iteration_dict in all_final_dicts:
+    for (file, spectra), specimen_data in iteration_dict.items():
+        bootstrap_by_specimen_agg = specimen_data['bootstrap_by_specimen']
 
-    # Initialize a list to store all bootstrap values for (file, spectra) combination
-    all_bootstrap_values = []
+        # Collect all bootstrap values for averaging
+        all_bootstrap_values = []
+        for specimen, bootstrap_values in bootstrap_by_specimen_agg.items():
+            if not isinstance(bootstrap_values, list):
+                bootstrap_values = [bootstrap_values]
+            cleaned_bootstrap_values = [val for val in bootstrap_values if val is not None]
+            all_bootstrap_values.extend(cleaned_bootstrap_values)
 
-    # Iterate through the specimens and collect bootstrap values
-    for specimen, bootstrap_values in bootstrap_by_specimen_agg.items():
-        # Ensure that bootstrap_values is treated as a list, even if it's a single int
-        if not isinstance(bootstrap_values, list):
-            bootstrap_values = [bootstrap_values]
+        # Compute the average bootstrap value for this (file, spectra) combination
+        if all_bootstrap_values:
+            avg_bootstrap_value = np.nanmean(all_bootstrap_values)
+            if (file, spectra) not in averaged_sample_size:
+                averaged_sample_size[(file, spectra)] = []
+            averaged_sample_size[(file, spectra)].append(avg_bootstrap_value)
 
-        # Filter out None values from bootstrap_values
-        cleaned_bootstrap_values = [val for val in bootstrap_values if val is not None]
+# Compute the final average for each (file, spectra) across all iterations
+final_averaged_sample_size = {
+    key: np.mean(values) for key, values in averaged_sample_size.items()
+}
 
-        # Add the cleaned bootstrap values to the list
-        all_bootstrap_values.extend(cleaned_bootstrap_values)
-
-    # Once all specimen values for this (file, spectra) are collected, compute the overall average
-    if all_bootstrap_values:
-        avg_bootstrap_value = np.nanmean(all_bootstrap_values)
-
-        # Store the averaged bootstrap value with file and spectra as keys (without specimen)
-        averaged_sample_size[(file, spectra)] = avg_bootstrap_value
-
-
-
-##Plotting
-# Extract spectra, averaged bootstrap values, and file names from averaged_sample_size
+# Plotting
 spectra_values = []
 avg_bootstrap_values = []
 file_names = []
 
-for (file, spectra), avg_value in averaged_sample_size.items():
-    # Extract the numeric part of the spectra (after "spectra.")
+for (file, spectra), avg_value in final_averaged_sample_size.items():
+    #file=re.findall(r'\d+', file)
     spectra_num = float(spectra.split('spectra.')[1])  # Extract the number after 'spectra.'
     spectra_values.append(spectra_num)
     avg_bootstrap_values.append(avg_value)
     file_names.append(file)
 
-# Create a unique color for each file name
-unique_file_names = list(set(file_names))  # Get a list of unique file names
-colors = cm.rainbow(np.linspace(0, 1, len(unique_file_names)))  # Generate a color map
-color_map = dict(zip(unique_file_names, colors))  # Map each file name to a unique color
 
-# Assign a color to each point based on the file name
-point_colors = [color_map[file] for file in file_names]
+# Create unique colors for each file name
+numbers = [
+    float(match.group())
+    for name in file_names
+    if (match := re.search(r'\d+\.\d+|\d+', name))
+]
+unique_file_names = sorted(set(numbers))
+unique_file_names_with_text = [f"{num}% Cotton" for num in unique_file_names]
 
-# Create scatter plot with colors
+colors = cm.tab10(np.linspace(0.1, 0.4, len(unique_file_names)))
+color_map = dict(zip(unique_file_names, colors))
+point_colors = [color_map[file] for file in numbers]
+
+# Create scatter plot
 plt.figure(figsize=(10, 6))
-scatter = plt.scatter(spectra_values, avg_bootstrap_values, c=point_colors, marker='o')
+plt.scatter(spectra_values, avg_bootstrap_values, c=point_colors, marker='o')
 
-# Add labels and title
 plt.xlabel('Wavenumbers')
-plt.ylabel('Min Sample Size')
-plt.title('Minimum Sample Size Required for Different Blend and Baseline Correction Combinations')
+plt.ylabel('Avg Min Sample Size (100 Iterations)')
+plt.title('Average Minimum Spot Number Required to Measure for Different Samples (SNV Applied)')
 
-# Create a legend based on file names
-handles = [plt.Line2D([0], [0], marker='o', color=color_map[file], linestyle='', markersize=10) for file in unique_file_names]
-plt.legend(handles, unique_file_names, title="File Names", loc='upper right')
+# Create a legend for file names
+handles = [plt.Line2D([0], [0], marker='o', color=color_map[file], linestyle='', markersize=10) for file in
+           unique_file_names]
+plt.legend(handles, unique_file_names_with_text, title="File Names", loc='best')
 
-# Show plot
 plt.show()

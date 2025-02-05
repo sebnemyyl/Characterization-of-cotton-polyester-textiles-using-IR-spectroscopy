@@ -1,14 +1,19 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.cm as cm
+
 
 def plot_resampling(jackknife_bootstrap_agg, wn, type='jackknife'):
-    # Line plot of RSDs
-    # Iterate over each specimen in the nested dictionary
+    # Generate a colormap
+    num_specimens = len(jackknife_bootstrap_agg)
+    colors = cm.rainbow(np.linspace(0, 1, num_specimens))  # Generate a range of colors
+    color_map = {specimen: color for specimen, color in zip(jackknife_bootstrap_agg.keys(), colors)}
+
     if type == 'jackknife':
         for specimen, data in jackknife_bootstrap_agg.items():
             left_spots = list(data.keys())
             rsd_values = list(data.values())
-            plt.plot(left_spots, rsd_values, marker='o', label=specimen)
+            plt.plot(left_spots, rsd_values, marker='o', label=specimen, color=color_map[specimen])
 
         plt.title(f'Jackknife Sampling by Specimen for {wn}')
         plt.xlabel('Left-out spot')
@@ -22,7 +27,7 @@ def plot_resampling(jackknife_bootstrap_agg, wn, type='jackknife'):
             left_spots = list(data.keys())
             rsd_values = list(data.values())
             avg_rsd_values = np.mean(rsd_values, axis=1)
-            plt.plot(left_spots, avg_rsd_values, marker='o', label=specimen)
+            plt.plot(left_spots, avg_rsd_values, marker='o', label=specimen, color=color_map[specimen])
             xint = range(min(left_spots), max(left_spots) + 1)
             plt.xticks(xint)
 
@@ -53,13 +58,18 @@ def plot_resampling_top_n(loaded_dict , type='jackknife'):
     averaged_data = {key: {inner_key: np.mean(values) for inner_key, values in inner_dict.items()}
                      for key, inner_dict in averages.items()}
 
+    # Generate a colormap
+    num_specimens = len(averaged_data)
+    colors = cm.rainbow(np.linspace(0, 1, num_specimens))  # Generate rainbow colors
+    color_map = {specimen: color for specimen, color in zip(averaged_data.keys(), colors)}
+
     # Convert to the required format
     spectra_avg = {"spectra_avg": averaged_data}
 
     for specimen, data in averaged_data.items():
         left_spots = list(data.keys())
         rsd_values = list(data.values())
-        plt.plot(left_spots, rsd_values, marker='o', label=specimen)
+        plt.plot(left_spots, rsd_values, marker='o', label=specimen, color=color_map[specimen])
         xint = range(min(left_spots), max(left_spots) + 1)
         plt.xticks(xint)
 
