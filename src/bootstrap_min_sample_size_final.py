@@ -11,9 +11,10 @@ import importlib.util
 # plot_p_val = importlib.util.module_from_spec(spec)
 from scipy.signal import find_peaks
 import re
+from scipy import stats
 
 print(os.getcwd())
-my_path = "../temp/reproducibility/new/snv"
+my_path = "../temp/reproducibility/new/no_bsn"
 
 variance_dic = {}
 rsd_dic = {}
@@ -85,14 +86,14 @@ def run_bootstrap(absorb_val_by_peaks):
 all_final_dicts = []
 
 # Repeat the process 100 times
-for iteration in range(100):
+for iteration in range(10):
     final_dict = {}
     for r, d, f in os.walk(my_path):
         for file in f:
             if file.endswith(".csv"):
                 print(f"Iteration {iteration}, processing file: {file}")
                 # Load the data
-                data = pd.read_csv(f'../temp/reproducibility/new/snv/{file}', sep=',', header=0)
+                data = pd.read_csv(f'../temp/reproducibility/new/no_bsn/{file}', sep=',', header=0)
                 related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
                 related_data = related_data.drop(
                     ['reference.pet', 'reference.cotton', 'reference.area', 'reference.spot',
@@ -109,6 +110,9 @@ for iteration in range(100):
                         absorb_val_by_peaks = result_series.get(specimen)[wn_index][:]
                         bootstrap_by_specimen = run_bootstrap(absorb_val_by_peaks)
                         bootstrap_by_specimen_agg[specimen] = bootstrap_by_specimen
+                        bootstrap_size_30 = np.random.choice(absorb_val_by_peaks, (10, 9), replace=True)
+                        print(stats.normaltest(bootstrap_size_30,axis=1))
+                        #print(stats.normaltest(absorb_val_by_peaks))
 
                     final_dict[(file, wn)] = {'bootstrap_by_specimen': bootstrap_by_specimen_agg}
 
