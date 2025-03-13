@@ -6,3 +6,6 @@ temp/
 src/.Rhistory
 .idea/
 *.Rhistory
+*.pkl
+*.yml
+playground/
