@@ -21,6 +21,10 @@ models = ["Kernel Ridge"]
 output_file = "temp/spectra_treated/nir/balanced/model_output_balanced.json"
 plot_path = "temp/spectra_treated/nir/balanced/plots"
 
+while os.path.exists(output_file):
+    output_file = output_file + "1"
+    
+print(f"Results will be saved to {output_file}")
 
 csv_files = util.get_files(input_dir)
 output = []
@@ -28,8 +32,10 @@ for csv_file in csv_files:
     csv_path = os.path.join(input_dir, csv_file)
     baseline_corr_type = get_baseline_corr_type(csv_file)
     data = model_util.load_feature_set_from_csv(csv_path)
-    #X_train, X_test, y_train, y_test, groups_train = model_util.split_feature_set_randomly(data)
-    X_train, X_test, y_train, y_test, groups_train = model_util.split_feature_set_with_specimen(data)
+    X_train, X_test, y_train, y_test, groups_train = model_util.split_feature_set_randomly(data)
+    # Change method body to choose column for test data split
+    #X_train, X_test, y_train, y_test, groups_train = model_util.split_feature_set_with_column(data)
+    print(f"Train data set size: {len(X_train)}, test data set size: {len(X_test)}")
     # Run PCA 
     #X_train, X_test = model_util.run_pca(X_train, X_test)
     for model in models:

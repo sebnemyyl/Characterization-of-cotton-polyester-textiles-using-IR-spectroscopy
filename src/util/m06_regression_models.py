@@ -28,7 +28,8 @@ def load_feature_set_from_csv(csv_file):
 # Prepare the feature set (exclude non-spectral columns) and
 # remove spectra from column name
 def get_X(data):
-    X = data.drop(columns=['Unnamed: 0', 'reference.pet', 'reference.cotton', 'reference.specimen', 'reference.area', 'reference.spot', 'reference.measuring_date'])
+    X = data.loc[:,~data.columns.str.startswith('reference')]
+    X = X.drop(columns=['Unnamed: 0'])
     X.columns = X.columns.str.replace('spectra.', '')
     return X
 
@@ -49,9 +50,10 @@ def split_feature_set_randomly(data_clean):
     X_test = get_X(X_test)
     return (X_train, X_test, y_train, y_test, groups_train)
 
-def split_feature_set_with_specimen(data_clean):
-    # Put all measurements of certain specimen into test data set
-    test_data = data_clean.loc[data_clean['reference.specimen'] == 3]
+def split_feature_set_with_column(data_clean):
+    # Put all measurements of certain column into test data set
+    #test_data = data_clean.loc[data_clean['reference.batch'] == 2]
+    test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
     X_test = get_X(test_data)
     training_data = data_clean[~data_clean.isin(test_data)].dropna()  
     groups_train = get_groups(training_data)
@@ -68,7 +70,7 @@ def run_pca(X_train, X_test, n_comps=50):
     X_test_pca = pca.transform(X_test)
     return (X_train_pca, X_test_pca)
 
-default_n_iter = 10
+default_n_iter = 40
 default_cv = GroupKFold(n_splits=5, shuffle=True)
 
 models = {
@@ -137,10 +139,19 @@ models = {
     "KNN": RandomizedSearchCV(
         KNeighborsRegressor(),
         param_distributions={
-            'n_neighbors': [3, 5, 10, 15, 20],
+            'n_neighbors': range(2, 50, 2),
             'weights': ['uniform', 'distance'],
-            'metric': ['euclidean', 'manhattan', 'minkowski'],
-            'p': [1, 2]  # For 'minkowski' metric, where p=1 is Manhattan and p=2 is Euclidean
+            'metric': ['euclidean', 'manhattan']
+        },
+        n_iter=default_n_iter,
+        cv=default_cv
+    ),
+    "KNN Minkowski": RandomizedSearchCV(
+        KNeighborsRegressor(metric='minkowski'),
+        param_distributions={
+            'n_neighbors': range(2, 50, 2),
+            'weights': ['uniform', 'distance'],
+            'p': [1, 2]  # p=1 is Manhattan and p=2 is Euclidean
         },
         n_iter=default_n_iter,
         cv=default_cv
@@ -178,6 +189,7 @@ def evaluate_model(model_name, baseline_corr, X_train, X_test, y_train, y_test, 
         title = f"{model_name} for {baseline_corr}"
         create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title)
         plt.savefig(file_path)
+        plt.clf()
         print(f"Saving Plot to {file_path}")
 
     return {

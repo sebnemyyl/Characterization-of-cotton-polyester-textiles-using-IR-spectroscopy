@@ -27,8 +27,11 @@ spectra_df_clean <- clean_up_spectra(spectra_df_full, type, remove_waterband = T
 #                                                   (reference.cotton == 39.47 & reference.measuring_date == 250127)) | 
 #                                                   (reference.cotton == 41.85 & reference.measuring_date == 250124))
 
-spectra_df_clean$reference.pet<-as.numeric(spectra_df_clean$reference.pet)
-spectra_df_clean$reference.cotton<-as.numeric(spectra_df_clean$reference.cotton)
+
+spectra_df_clean$reference.pet <- as.numeric(spectra_df_clean$reference.pet)
+spectra_df_clean$reference.cotton <- as.numeric(spectra_df_clean$reference.cotton)
+
+spectra_df_clean <- fix_cotton_content(spectra_df_clean)
 
 save_csv(spectra_df_clean, output_path)
 
