@@ -252,3 +252,17 @@ def create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title = "Predi
     plt.xlabel("Actual")
     plt.ylabel("Predicted")
     plt.title(title)
+
+
+def evaluate_cv_split(X_train, y_train, groups_train):
+    kFold = GroupKFold(n_splits=5)
+    for i, (train_index, validation_index) in enumerate(kFold.split(X_train, groups=groups_train)):
+        print(f"Fold {i}:")
+        print(f"  Training size={len(train_index)}")
+        print(f"  Validation size={len(validation_index)}")
+        validation_values = y_train.iloc[validation_index]
+        count = validation_values.value_counts().sort_index()
+        count.plot(kind='bar', color='skyblue')
+        print(count)
+        plt.show()
+        plt.clf()

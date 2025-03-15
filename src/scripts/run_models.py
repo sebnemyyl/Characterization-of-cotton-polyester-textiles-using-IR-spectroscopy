@@ -16,7 +16,7 @@ def get_baseline_corr_type(csv_file):
 
 #os.chdir("../..")
 print(os.getcwd())
-input_dir = "temp/fixed_cotton/input"
+input_dir = "temp/combined/input"
 models = ["Kernel Ridge"]
 output_file = "temp/fixed_cotton/model_output_try.json"
 plot_path = "temp/fixed_cotton/plots"
@@ -59,7 +59,8 @@ for csv_file in csv_files:
     print(f"Train data set size: {len(X_train)}, test data set size: {len(X_test)}")
     # Run PCA 
     X_train, X_test = model_util.run_pca(X_train, X_test, n_comps=15)
+    model_util.evaluate_cv_split(X_train, y_train, groups_train)
     #model_util.evaluate_alpha( baseline_corr_type, X_train, X_test, y_train, y_test, plot_path, groups_train)
-    for model in models:
-        print(f"Evaluating model {model} for {baseline_corr_type}")
-        eval_with_hyper_param_search(model, baseline_corr_type, X_train, X_test, y_train, y_test, plot_path, groups_train, output)
+    # for model in models:
+    #     print(f"Evaluating model {model} for {baseline_corr_type}")
+    #     eval_with_hyper_param_search(model, baseline_corr_type, X_train, X_test, y_train, y_test, plot_path, groups_train, output)
