@@ -1,7 +1,7 @@
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.model_selection import GridSearchCV, KFold, GroupKFold
-from sklearn.model_selection import RandomizedSearchCV, train_test_split, cross_val_score
+from sklearn.model_selection import RandomizedSearchCV, train_test_split, cross_val_score, cross_validate
 from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neural network
 from sklearn.svm import SVR
 from sklearn.decomposition import PCA
@@ -72,7 +72,7 @@ def run_pca(X_train, X_test, n_comps=50):
     return (X_train_pca, X_test_pca)
 
 default_n_iter = 40
-default_cv = GroupKFold(n_splits=5, shuffle=True, random_state=12)
+default_cv = GroupKFold(n_splits=5)
 
 models = {
     "SVR": RandomizedSearchCV(
@@ -164,32 +164,49 @@ alpha_list = np.geomspace(1e-10, 1.0, 30)
 
 def evaluate_alpha(baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
     model = KernelRidge(kernel="polynomial", degree=3, gamma=1/15)
-    cv_values = []
-    train_values = []
-    test_values = []
+    cv_rmse_values = []
+    train_rmse_values = []
+    test_rmse_values = []
+    cv_r2_values = []
+    train_r2_values = []
+    test_r2_values = []
     print(f"Cross val for {baseline_corr}")
     for alpha in alpha_list:
         model.set_params(alpha=alpha)
-        val_scores = cross_val_score(model, X_train, y=y_train, scoring="neg_root_mean_squared_error", groups=groups_train, cv=default_cv)
-        cv_rmse = np.mean(val_scores) * -1
+        scoring_metrics = ['neg_root_mean_squared_error', 'r2']
+        cross_val_res = cross_validate(model, X_train, y=y_train, scoring=scoring_metrics, groups=groups_train, cv=default_cv, return_estimator=True)
+        cv_rmse_scores = cross_val_res['test_neg_root_mean_squared_error']
+        cv_r2_scores = cross_val_res['test_r2']
+        cv_rmse = np.mean(cv_rmse_scores) * -1
+        cv_r2 = np.mean(cv_r2_scores) 
         model.fit(X_train, y_train)
         train_pred = model.predict(X_train)
         (train_rmse, train_r2) = calc_error_metrics(y_train, train_pred)
         test_pred = model.predict(X_test)
         (test_rmse, test_r2) = calc_error_metrics(y_test, test_pred)
-        cv_values.append(cv_rmse)
-        train_values.append(train_rmse)
-        test_values.append(test_rmse)
+        cv_rmse_values.append(cv_rmse)
+        train_rmse_values.append(train_rmse)
+        test_rmse_values.append(test_rmse)
+        cv_r2_values.append(cv_r2)
+        train_r2_values.append(train_r2)
+        test_r2_values.append(test_r2)
+    file_name = f"alpha_rmse_{baseline_corr}.png"
+    file_path = os.path.join(plot_path, file_name)
+    create_plot(file_path, baseline_corr, train_rmse_values, cv_rmse_values, test_rmse_values)
+    file_name = f"alpha_r2_{baseline_corr}.png"
+    file_path = os.path.join(plot_path, file_name)
+    create_plot(file_path, baseline_corr, train_r2_values, cv_r2_values, test_r2_values)
+
+def create_plot(file_path, baseline_corr, train_values, cv_values, test_values):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x = alpha_list, y = train_values, mode="lines+markers", name="Train"))
     fig.add_trace(go.Scatter(x = alpha_list, y = cv_values, mode="lines+markers", name="CV"))
     fig.add_trace(go.Scatter(x = alpha_list, y = test_values, mode="lines+markers", name="Test"))
-    fig.update_layout(xaxis_title=r"$\alpha$", xaxis_type="log", xaxis_tickformat="e", yaxis_title="CV RMSE")
+    fig.update_layout(xaxis_title=r"$\alpha$", xaxis_type="log", xaxis_tickformat="e", yaxis_title="Error")
     fig.update_layout(title = f"Plot for {baseline_corr}")
     #fig.show()
-    file_name = f"alpha_{baseline_corr}.png"
-    file_path = os.path.join(plot_path, file_name)
     fig.write_image(file_path)
+
 
 
 def calc_error_metrics(actual, predicted):
