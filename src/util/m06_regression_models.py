@@ -1,7 +1,7 @@
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.model_selection import GridSearchCV, KFold, GroupKFold
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
+from sklearn.model_selection import RandomizedSearchCV, train_test_split, cross_val_score
 from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neural network
 from sklearn.svm import SVR
 from sklearn.decomposition import PCA
@@ -9,6 +9,7 @@ from sklearn.cross_decomposition import PLSRegression
 from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
+import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import time
@@ -71,7 +72,7 @@ def run_pca(X_train, X_test, n_comps=50):
     return (X_train_pca, X_test_pca)
 
 default_n_iter = 40
-default_cv = GroupKFold(n_splits=5, shuffle=True)
+default_cv = GroupKFold(n_splits=5, shuffle=True, random_state=12)
 
 models = {
     "SVR": RandomizedSearchCV(
@@ -158,30 +159,68 @@ models = {
     ),
 }
 
+#alpha_list =  [1e0, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
+alpha_list = np.geomspace(1e-10, 1.0, 30)
 
-def evaluate_model(model_name, baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
+def evaluate_alpha(baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
+    model = KernelRidge(kernel="polynomial", degree=3, gamma=1/15)
+    cv_values = []
+    train_values = []
+    test_values = []
+    print(f"Cross val for {baseline_corr}")
+    for alpha in alpha_list:
+        model.set_params(alpha=alpha)
+        val_scores = cross_val_score(model, X_train, y=y_train, scoring="neg_root_mean_squared_error", groups=groups_train, cv=default_cv)
+        cv_rmse = np.mean(val_scores) * -1
+        model.fit(X_train, y_train)
+        train_pred = model.predict(X_train)
+        (train_rmse, train_r2) = calc_error_metrics(y_train, train_pred)
+        test_pred = model.predict(X_test)
+        (test_rmse, test_r2) = calc_error_metrics(y_test, test_pred)
+        cv_values.append(cv_rmse)
+        train_values.append(train_rmse)
+        test_values.append(test_rmse)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x = alpha_list, y = train_values, mode="lines+markers", name="Train"))
+    fig.add_trace(go.Scatter(x = alpha_list, y = cv_values, mode="lines+markers", name="CV"))
+    fig.add_trace(go.Scatter(x = alpha_list, y = test_values, mode="lines+markers", name="Test"))
+    fig.update_layout(xaxis_title=r"$\alpha$", xaxis_type="log", xaxis_tickformat="e", yaxis_title="CV RMSE")
+    fig.update_layout(title = f"Plot for {baseline_corr}")
+    #fig.show()
+    file_name = f"alpha_{baseline_corr}.png"
+    file_path = os.path.join(plot_path, file_name)
+    fig.write_image(file_path)
+
+
+def calc_error_metrics(actual, predicted):
+    rmse = root_mean_squared_error(actual, predicted)
+    r2 = r2_score(actual, predicted)
+    return (rmse, r2)
+
+
+def hyper_param_search(model_name, baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
     model = models[model_name]
     # Train the model
     start_time = time.time()
     model.fit(X_train, y_train, groups = groups_train)
     training_time = time.time() - start_time
     cv_res = model.cv_results_
-    cv_results = pd.DataFrame(cv_res)[['mean_test_score', 'std_test_score', 'rank_test_score']]
+    cv_results = pd.DataFrame(cv_res)[['mean_test_score', 'std_test_score', 'rank_test_score', 'params']]
     print(cv_results)
+    print(model.best_estimator_)
+    cv_r2 = model.best_score_
+    print(cv_r2)
 
     # Predict
     start_time = time.time()
     y_pred = model.predict(X_test)
     prediction_time = time.time() - start_time
 
-    # Calculate metrics
-    rmse = root_mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
+    (test_rmse, test_r2) = calc_error_metrics(y_test, y_pred)
 
     # Training performance
     y_train_pred = model.predict(X_train)
-    train_rmse = root_mean_squared_error(y_train, y_train_pred)
-    train_r2 = r2_score(y_train, y_train_pred)
+    (train_rmse, train_r2) = calc_error_metrics(y_train, y_train_pred)
 
     if plot_path != "":
         file_name = f"{model_name}_{baseline_corr}.png"
@@ -197,8 +236,8 @@ def evaluate_model(model_name, baseline_corr, X_train, X_test, y_train, y_test, 
         "best_params": model.best_params_,
         "training_time": training_time,
         "prediction_time": prediction_time,
-        "test_rmse": rmse,
-        "test_r2": r2,
+        "test_rmse": test_rmse,
+        "test_r2": test_r2,
         "train_rmse": train_rmse,
         "train_r2": train_r2
     }

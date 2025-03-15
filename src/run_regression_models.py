@@ -16,7 +16,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Run the model
 my_name = "SVR"
-results = model_util.evaluate_model(my_name, X_train, X_test, y_train, y_test)
+results = model_util.hyper_param_search(my_name, X_train, X_test, y_train, y_test)
 print(f"{my_name} done. Best params: {results['best_params']}")
 
 
