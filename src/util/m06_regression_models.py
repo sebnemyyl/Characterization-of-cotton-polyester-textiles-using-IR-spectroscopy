@@ -6,6 +6,7 @@ from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neura
 from sklearn.svm import SVR
 from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import PLSRegression
+from scipy.spatial.distance import pdist
 from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
@@ -87,10 +88,23 @@ models = {
         n_iter=default_n_iter,
         cv=default_cv
     ),
-    "Kernel Ridge": RandomizedSearchCV(
+    "Kernel Ridge rbf": RandomizedSearchCV(
         KernelRidge(kernel="rbf"),
         scoring="r2",
-        param_distributions={"alpha": [1e0, 0.1, 1e-2, 1e-3], "gamma": np.logspace(-2, 2, 5)},
+        param_distributions= {
+            "alpha": np.logspace(-3, 2, 10),
+            "gamma": np.logspace(-2, 6, 8) # Gamma should be close to median squared pairwise distance
+        },
+        n_iter=default_n_iter,
+        cv=default_cv
+    ),
+    "Kernel Ridge poly": RandomizedSearchCV(
+        KernelRidge(kernel="poly"), # gamma = default (1/n_features)
+        scoring="r2",
+        param_distributions={
+            "alpha": np.logspace(-3, 2, 10),
+            'degree': [2, 3, 4, 5]
+        },
         n_iter=default_n_iter,
         cv=default_cv
     ),
@@ -283,3 +297,11 @@ def evaluate_cv_split(X_train, y_train, groups_train):
         print(count)
         plt.show()
         plt.clf()
+
+def median_squared_pairwise_distance(X):
+    # Compute pairwise Euclidean distances
+    pairwise_distances = pdist(X, metric='euclidean')
+    # Square the distances
+    squared_distances = pairwise_distances ** 2
+    # Return the median of the squared distances
+    return np.median(squared_distances)

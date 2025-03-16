@@ -9,16 +9,19 @@ import json
 import util.m00_general_util as util
 import util.m06_regression_models as model_util
 
+
+
+
 def get_baseline_corr_type(csv_file):
     name_without_ending = os.path.splitext(csv_file)[0]
     parts = name_without_ending.split("_")
     return parts[-1]
 
-#os.chdir("../..")
+os.chdir("../..")
 print(os.getcwd())
-input_dir = "temp/combined/input"
-models = ["Kernel Ridge"]
-output_file = "temp/fixed_cotton/model_output_try.json"
+input_dir = "temp/fixed_cotton/input"
+models = ["Kernel Ridge poly"]
+output_file = "temp/fixed_cotton/model_output_kernel_rbf.json"
 plot_path = "temp/fixed_cotton/plots"
 
 while os.path.exists(output_file):
@@ -59,8 +62,11 @@ for csv_file in csv_files:
     print(f"Train data set size: {len(X_train)}, test data set size: {len(X_test)}")
     # Run PCA 
     X_train, X_test = model_util.run_pca(X_train, X_test, n_comps=15)
-    model_util.evaluate_cv_split(X_train, y_train, groups_train)
+    #dist = model_util.median_squared_pairwise_distance(X_train)
+    #print(f"{baseline_corr_type} has dist: {dist}, recommended gamma for RBF: {1/dist}")
+
+    #model_util.evaluate_cv_split(X_train, y_train, groups_train)
     #model_util.evaluate_alpha( baseline_corr_type, X_train, X_test, y_train, y_test, plot_path, groups_train)
-    # for model in models:
-    #     print(f"Evaluating model {model} for {baseline_corr_type}")
-    #     eval_with_hyper_param_search(model, baseline_corr_type, X_train, X_test, y_train, y_test, plot_path, groups_train, output)
+    for model in models:
+         print(f"Evaluating model {model} for {baseline_corr_type}")
+         eval_with_hyper_param_search(model, baseline_corr_type, X_train, X_test, y_train, y_test, plot_path, groups_train, output)
