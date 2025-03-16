@@ -76,14 +76,23 @@ default_n_iter = 40
 default_cv = GroupKFold(n_splits=5)
 
 models = {
-    "SVR": RandomizedSearchCV(
-        SVR(cache_size=7000),
+    "SVR rbf": RandomizedSearchCV(
+        SVR(cache_size=7000, kernel="rbf"),
         param_distributions={
-            'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-            'C': [10, 1, 0.1, 0.01, 0.001],
-            'gamma': np.logspace(-2, 2, 5),
-            'epsilon': [0.01, 0.1, 0.5, 1.0],
-            'degree': [2, 3, 4, 5],
+            'C': np.logspace(-3, 2, 6),
+            'gamma': np.logspace(-2, 6, 9),
+            'epsilon': np.logspace(-3, 1, 5)
+        },
+        n_iter=default_n_iter,
+        cv=default_cv
+    ),
+    "SVR poly": RandomizedSearchCV(
+        SVR(cache_size=7000, kernel='poly'),
+        param_distributions={
+            'C': np.logspace(-3, 2, 6),
+            'gamma': np.logspace(-2, 6, 9) ,
+            'epsilon': np.logspace(-3, 1, 5),
+            'degree': [2, 3, 4, 5]
         },
         n_iter=default_n_iter,
         cv=default_cv
@@ -92,8 +101,19 @@ models = {
         KernelRidge(kernel="rbf"),
         scoring="r2",
         param_distributions= {
-            "alpha": np.logspace(-3, 2, 10),
-            "gamma": np.logspace(-2, 6, 8) # Gamma should be close to median squared pairwise distance
+            "alpha": np.logspace(-3, 2, 6),
+            "gamma": np.logspace(-2, 6, 9) # Gamma should be close to median squared pairwise distance
+        },
+        n_iter=default_n_iter,
+        cv=default_cv,
+        n_jobs=3
+    ),
+    "SVR sigmoid": RandomizedSearchCV(
+        SVR(cache_size=7000, kernel="sigmoid"),
+        param_distributions={
+            'C': np.logspace(-3, 2, 6),
+            'gamma': np.logspace(-2, 6, 9),
+            'epsilon': np.logspace(-3, 1, 5)
         },
         n_iter=default_n_iter,
         cv=default_cv
