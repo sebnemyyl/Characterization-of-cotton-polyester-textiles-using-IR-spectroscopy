@@ -1,3 +1,8 @@
+import sys
+# Needed for Python to find the util modules
+sys.path.insert(0, "src")
+sys.path.insert(0, "..")
+
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.model_selection import GridSearchCV, KFold, GroupKFold
@@ -17,63 +22,11 @@ import time
 import matplotlib.pyplot as plt
 import os
 
-import numpy as np
-
-def load_feature_set_from_csv(csv_file):
-    baseline_corrected_data = pd.read_csv(csv_file, sep=',', header=0)
-    # Convert the cotton column to numeric and handle errors
-    baseline_corrected_data['reference.cotton'] = pd.to_numeric(baseline_corrected_data['reference.cotton'], errors='coerce')
-    # Drop rows with missing cotton values
-    data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
-    return data_clean
- 
-# Prepare the feature set (exclude non-spectral columns) and
-# remove spectra from column name
-def get_X(data):
-    X = data.loc[:,~data.columns.str.startswith('reference')]
-    X = X.drop(columns=['Unnamed: 0'])
-    X.columns = X.columns.str.replace('spectra.', '')
-    return X
-
-# Creates group list (combines cotton and specimen for unique specimen id)
-def get_groups(data):
-    groups = data['reference.cotton'] * 100000 + data['reference.specimen']
-    unique_groups = np.unique(groups)
-    print(f"Data set has {len(unique_groups)} number of unique specimen: {unique_groups}")
-    return groups
-
-def split_feature_set_randomly(data_clean):
-    # Prepare the feature set (exclude non-spectral columns)
-    # Prepare the target column (cotton content)
-    y = data_clean['reference.cotton']
-    X_train, X_test, y_train, y_test = train_test_split(data_clean, y, test_size=0.25)
-    groups_train = get_groups(X_train)
-    X_train = get_X(X_train)
-    X_test = get_X(X_test)
-    return (X_train, X_test, y_train, y_test, groups_train)
-
-def split_feature_set_with_column(data_clean):
-    # Put all measurements of certain column into test data set
-    #test_data = data_clean.loc[data_clean['reference.batch'] == 2]
-    test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
-    X_test = get_X(test_data)
-    training_data = data_clean[~data_clean.isin(test_data)].dropna()  
-    groups_train = get_groups(training_data)
-    X_train = get_X(training_data)
-
-    # Prepare the target column (cotton content)
-    y_test = test_data['reference.cotton']
-    y_train = training_data['reference.cotton']
-    return (X_train, X_test, y_train, y_test, groups_train)
-
-def run_pca(X_train, X_test, n_comps=50):
-    pca = PCA(n_components=n_comps)
-    X_train_pca = pca.fit_transform(X_train)
-    X_test_pca = pca.transform(X_test)
-    return (X_train_pca, X_test_pca)
+import util.m06_model_prep as prep_util
+import util.m06_cnn_model as cnn_util
 
 default_n_iter = 40
-default_cv = GroupKFold(n_splits=5)
+default_cv = GroupKFold(n_splits=4)
 
 models = {
     "SVR rbf": RandomizedSearchCV(
@@ -191,6 +144,12 @@ models = {
         n_iter=default_n_iter,
         cv=default_cv
     ),
+    "CNN": RandomizedSearchCV(
+        cnn_util.cnn_regressor,
+        param_distributions=cnn_util.cnn_params,
+        n_iter=default_n_iter,
+        cv=default_cv
+    ),
 }
 
 #alpha_list =  [1e0, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
@@ -205,10 +164,11 @@ def evaluate_alpha(baseline_corr, X_train, X_test, y_train, y_test, plot_path = 
     train_r2_values = []
     test_r2_values = []
     print(f"Cross val for {baseline_corr}")
+    cv = default_cv
     for alpha in alpha_list:
         model.set_params(alpha=alpha)
         scoring_metrics = ['neg_root_mean_squared_error', 'r2']
-        cross_val_res = cross_validate(model, X_train, y=y_train, scoring=scoring_metrics, groups=groups_train, cv=default_cv, return_estimator=True)
+        cross_val_res = cross_validate(model, X_train, y=y_train, scoring=scoring_metrics, groups=groups_train, cv=cv, return_estimator=True)
         cv_rmse_scores = cross_val_res['test_neg_root_mean_squared_error']
         cv_r2_scores = cross_val_res['test_r2']
         cv_rmse = np.mean(cv_rmse_scores) * -1
@@ -226,12 +186,12 @@ def evaluate_alpha(baseline_corr, X_train, X_test, y_train, y_test, plot_path = 
         test_r2_values.append(test_r2)
     file_name = f"alpha_rmse_{baseline_corr}.png"
     file_path = os.path.join(plot_path, file_name)
-    create_plot(file_path, baseline_corr, train_rmse_values, cv_rmse_values, test_rmse_values)
+    create_comparison_plot(file_path, baseline_corr, train_rmse_values, cv_rmse_values, test_rmse_values)
     file_name = f"alpha_r2_{baseline_corr}.png"
     file_path = os.path.join(plot_path, file_name)
-    create_plot(file_path, baseline_corr, train_r2_values, cv_r2_values, test_r2_values)
+    create_comparison_plot(file_path, baseline_corr, train_r2_values, cv_r2_values, test_r2_values)
 
-def create_plot(file_path, baseline_corr, train_values, cv_values, test_values):
+def create_comparison_plot(file_path, baseline_corr, train_values, cv_values, test_values):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x = alpha_list, y = train_values, mode="lines+markers", name="Train"))
     fig.add_trace(go.Scatter(x = alpha_list, y = cv_values, mode="lines+markers", name="CV"))
@@ -242,7 +202,6 @@ def create_plot(file_path, baseline_corr, train_values, cv_values, test_values):
     fig.write_image(file_path)
 
 
-
 def calc_error_metrics(actual, predicted):
     rmse = root_mean_squared_error(actual, predicted)
     r2 = r2_score(actual, predicted)
@@ -251,6 +210,8 @@ def calc_error_metrics(actual, predicted):
 
 def hyper_param_search(model_name, baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
     model = models[model_name]
+    # Enable when you want to use the predefined group split
+    #model.cv = prep_util.predefined_group_split(groups_train)
     # Train the model
     start_time = time.time()
     model.fit(X_train, y_train, groups = groups_train)
@@ -290,7 +251,8 @@ def hyper_param_search(model_name, baseline_corr, X_train, X_test, y_train, y_te
         "test_rmse": test_rmse,
         "test_r2": test_r2,
         "train_rmse": train_rmse,
-        "train_r2": train_r2
+        "train_r2": train_r2,
+        "cv_r2": cv_r2
     }
 
 def create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title = "Prediction plot"):
@@ -306,8 +268,8 @@ def create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title = "Predi
 
 
 def evaluate_cv_split(X_train, y_train, groups_train):
-    kFold = GroupKFold(n_splits=5)
-    for i, (train_index, validation_index) in enumerate(kFold.split(X_train, groups=groups_train)):
+    cv = default_cv
+    for i, (train_index, validation_index) in enumerate(cv.split(X_train, groups=groups_train)):
         print(f"Fold {i}:")
         print(f"  Training size={len(train_index)}")
         print(f"  Validation size={len(validation_index)}")
