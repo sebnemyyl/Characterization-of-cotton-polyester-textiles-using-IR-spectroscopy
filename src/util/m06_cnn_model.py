@@ -5,13 +5,16 @@ from tensorflow.keras.metrics import RootMeanSquaredError
 from tensorflow.keras.layers import Input
 from keras.wrappers import SKLearnRegressor
 
+import numpy as np
+
 
 
 def create_cnn(X, y, optimizer):
+    features_normalized = X[:, :, np.newaxis]
     print(f"Using optimizer: {optimizer} with {len(X)} values")
     dropout_rate = 0.3
     model = Sequential([
-        Input(shape=(X.shape[1], 1)),
+        Input(shape=(features_normalized.shape[1], 1)),
         Conv1D(filters=32, kernel_size=7, activation='relu', kernel_regularizer=l2(0.01)),
         MaxPooling1D(pool_size=2),
         Conv1D(filters=64, kernel_size=7, activation='relu', kernel_regularizer=l2(0.001)),
@@ -31,7 +34,7 @@ def create_cnn(X, y, optimizer):
 cnn_regressor = SKLearnRegressor(
     model=create_cnn, 
     model_kwargs={
-        "optimizer": "rmsprop"
+        "optimizer": "adam"
     },
     # fit_kwargs doesn't seem to work
     fit_kwargs={
