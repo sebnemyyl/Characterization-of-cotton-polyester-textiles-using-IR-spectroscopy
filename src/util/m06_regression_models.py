@@ -152,11 +152,7 @@ models = {
     ),
 }
 
-#alpha_list =  [1e0, 0.1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
-alpha_list = np.geomspace(1e-10, 1.0, 30)
-
-def evaluate_alpha(baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
-    model = KernelRidge(kernel="polynomial", degree=3, gamma=1/15)
+def evaluate_error_over_param(model, baseline_corr, param_name, param_list, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
     cv_rmse_values = []
     train_rmse_values = []
     test_rmse_values = []
@@ -165,14 +161,21 @@ def evaluate_alpha(baseline_corr, X_train, X_test, y_train, y_test, plot_path = 
     test_r2_values = []
     print(f"Cross val for {baseline_corr}")
     cv = default_cv
-    for alpha in alpha_list:
-        model.set_params(alpha=alpha)
+    for param_value in param_list:
+        model.set_params(**{param_name: param_value})
         scoring_metrics = ['neg_root_mean_squared_error', 'r2']
         cross_val_res = cross_validate(model, X_train, y=y_train, scoring=scoring_metrics, groups=groups_train, cv=cv, return_estimator=True)
-        cv_rmse_scores = cross_val_res['test_neg_root_mean_squared_error']
+
         cv_r2_scores = cross_val_res['test_r2']
-        cv_rmse = np.mean(cv_rmse_scores) * -1
         cv_r2 = np.mean(cv_r2_scores) 
+
+        cv_rmse_scores = cross_val_res['test_neg_root_mean_squared_error']
+        rmse_std = np.std(cv_rmse_scores)
+        cv_rmse = np.mean(cv_rmse_scores) * -1
+        std_percentage = rmse_std / cv_rmse
+        print(cv_rmse_scores)
+        print(f"{param_name} {param_value} has RMSE Score: {cv_rmse} with std dev: {rmse_std} ({std_percentage}%)")
+
         model.fit(X_train, y_train)
         train_pred = model.predict(X_train)
         (train_rmse, train_r2) = calc_error_metrics(y_train, train_pred)
@@ -184,21 +187,21 @@ def evaluate_alpha(baseline_corr, X_train, X_test, y_train, y_test, plot_path = 
         cv_r2_values.append(cv_r2)
         train_r2_values.append(train_r2)
         test_r2_values.append(test_r2)
-    file_name = f"alpha_rmse_{baseline_corr}.png"
-    file_path = os.path.join(plot_path, file_name)
-    create_comparison_plot(file_path, baseline_corr, train_rmse_values, cv_rmse_values, test_rmse_values)
-    file_name = f"alpha_r2_{baseline_corr}.png"
-    file_path = os.path.join(plot_path, file_name)
-    create_comparison_plot(file_path, baseline_corr, train_r2_values, cv_r2_values, test_r2_values)
+    model_name = type(model).__name__
+    create_comparison_plot(plot_path, model_name, baseline_corr, param_name, "rmse", param_list, train_rmse_values, cv_rmse_values, test_rmse_values)
+    create_comparison_plot(plot_path, model_name, baseline_corr, param_name, "r2", param_list, train_r2_values, cv_r2_values, test_r2_values)
 
-def create_comparison_plot(file_path, baseline_corr, train_values, cv_values, test_values):
+def create_comparison_plot(plot_path, model_name, baseline_corr, param_name, error_name, param_list, train_values, cv_values, test_values):
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x = alpha_list, y = train_values, mode="lines+markers", name="Train"))
-    fig.add_trace(go.Scatter(x = alpha_list, y = cv_values, mode="lines+markers", name="CV"))
-    fig.add_trace(go.Scatter(x = alpha_list, y = test_values, mode="lines+markers", name="Test"))
-    fig.update_layout(xaxis_title=r"$\alpha$", xaxis_type="log", xaxis_tickformat="e", yaxis_title="Error")
-    fig.update_layout(title = f"Plot for {baseline_corr}")
+    fig.add_trace(go.Scatter(x = param_list, y = train_values, mode="lines+markers", name="Train"))
+    fig.add_trace(go.Scatter(x = param_list, y = cv_values, mode="lines+markers", name="CV"))
+    fig.add_trace(go.Scatter(x = param_list, y = test_values, mode="lines+markers", name="Test"))
+    fig.update_layout(xaxis_title=param_name, xaxis_type="log", xaxis_tickformat="e", yaxis_title=error_name)
+    title = f"{model_name}, {baseline_corr} {error_name} over {param_name}"
+    fig.update_layout(title = title)
     #fig.show()
+    file_name = f"{model_name}_{param_name}_{error_name}_{baseline_corr}.png"
+    file_path = os.path.join(plot_path, file_name)
     fig.write_image(file_path)
 
 

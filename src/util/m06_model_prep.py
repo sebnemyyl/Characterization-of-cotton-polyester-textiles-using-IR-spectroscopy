@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 
 from sklearn.model_selection import train_test_split, PredefinedSplit 
 from sklearn.decomposition import PCA
@@ -12,6 +13,11 @@ def load_feature_set_from_csv(csv_file):
     # Drop rows with missing cotton values
     data_clean = baseline_corrected_data.dropna(subset=['reference.cotton'])
     return data_clean
+
+def get_baseline_corr_type(csv_file):
+    name_without_ending = os.path.splitext(csv_file)[0]
+    parts = name_without_ending.split("_")
+    return parts[-1]
 
 def run_pca(X_train, X_test, n_comps=50):
     pca = PCA(n_components=n_comps)
@@ -34,20 +40,19 @@ def get_groups(data):
     print(f"Data set has {len(unique_groups)} number of unique specimen: {unique_groups}")
     return groups
 
-def split_feature_set_randomly(data_clean):
+def split_feature_set_randomly(data_clean, test_size = 0.2):
     # Prepare the feature set (exclude non-spectral columns)
     # Prepare the target column (cotton content)
     y = data_clean['reference.cotton']
-    X_train, X_test, y_train, y_test = train_test_split(data_clean, y, test_size=0.25)
+    X_train, X_test, y_train, y_test = train_test_split(data_clean, y, test_size=test_size)
     groups_train = get_groups(X_train)
     X_train = get_X(X_train)
     X_test = get_X(X_test)
     return (X_train, X_test, y_train, y_test, groups_train)
 
-def split_feature_set_with_column(data_clean):
+def split_feature_set_with_attribute(data_clean, selected_attribute = 'reference.specimen', test_value = 1):
     # Put all measurements of certain column into test data set
-    #test_data = data_clean.loc[data_clean['reference.batch'] == 2]
-    test_data = data_clean.loc[data_clean['reference.specimen'] == 1]
+    test_data = data_clean.loc[data_clean[selected_attribute] == test_value]
     X_test = get_X(test_data)
     training_data = data_clean[~data_clean.isin(test_data)].dropna()  
     groups_train = get_groups(training_data)
