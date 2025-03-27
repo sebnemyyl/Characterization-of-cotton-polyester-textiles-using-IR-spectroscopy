@@ -28,6 +28,55 @@ import util.m06_cnn_model as cnn_util
 default_n_iter = 40
 default_cv = GroupKFold(n_splits=4)
 
+class Model:
+    def __init__(self, name, sk_model, param_distributions):
+        self.name = name
+        self.sk_model = sk_model
+        self.param_distributions = param_distributions
+
+model_list = [
+    Model(
+        name="SVR rbf", 
+        sk_model=SVR(cache_size=7000, kernel="rbf"),
+        param_distributions={
+            'C': np.logspace(-3, 2, 6),
+            'gamma': np.logspace(-2, 6, 9),
+            'epsilon': np.logspace(-3, 1, 5)
+        }
+    ),
+    Model(
+        name="SVR poly",
+        sk_model=SVR(cache_size=7000, kernel='poly'),
+        param_distributions={
+            'C': np.logspace(-3, 2, 6),
+            'gamma': np.logspace(-2, 6, 9) ,
+            'epsilon': np.logspace(-3, 1, 5),
+            'degree': [2, 3, 4, 5]
+        }
+    ),
+    Model(
+        name="Kernel Ridge rbf",
+        sk_model=KernelRidge(kernel="rbf"),
+        param_distributions={
+            "alpha": np.logspace(-3, 2, 6),
+            "gamma": np.logspace(-2, 6, 9) # Gamma should be close to median squared pairwise distance
+        }
+    ),
+    Model(
+        name="CNN",
+        sk_model=cnn_util.cnn_regressor,
+        param_distributions=cnn_util.cnn_params
+    )
+]
+
+def get_model(name):
+    return next((model for model in model_list if model.name == name), None)
+
+def combine_cv_search_params(pca_params={}, model_params={}):
+    return {f'pca__{key}': value for key, value in pca_params.items()} | \
+           {f'model__{key}': value for key, value in model_params.items()}
+
+# TODO: The models need to be added to model_list instead
 models = {
     "SVR rbf": RandomizedSearchCV(
         SVR(cache_size=7000, kernel="rbf"),
@@ -211,44 +260,45 @@ def calc_error_metrics(actual, predicted):
     return (rmse, r2)
 
 
-def hyper_param_search(model_name, baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
-    model = models[model_name]
+def hyper_param_search(pipeline, model, baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
+    param_grid = combine_cv_search_params(model_params=model.param_distributions)
     # Enable when you want to use the predefined group split
-    #model.cv = prep_util.predefined_group_split(groups_train)
+    #default_cv = prep_util.predefined_group_split(groups_train)
+    cv_search = RandomizedSearchCV(pipeline, param_grid, cv=default_cv, n_iter=default_n_iter)
     # Train the model
     start_time = time.time()
-    model.fit(X_train, y_train, groups = groups_train)
+    cv_search.fit(X_train, y_train, groups = groups_train)
     training_time = time.time() - start_time
-    cv_res = model.cv_results_
+    cv_res = cv_search.cv_results_
     cv_results = pd.DataFrame(cv_res)[['mean_test_score', 'std_test_score', 'rank_test_score', 'params']]
     print(cv_results)
-    print(model.best_estimator_)
-    cv_r2 = model.best_score_
+    print(cv_search.best_estimator_)
+    cv_r2 = cv_search.best_score_
     print(cv_r2)
 
     # Predict
     start_time = time.time()
-    y_pred = model.predict(X_test)
+    y_pred = cv_search.predict(X_test)
     prediction_time = time.time() - start_time
 
     (test_rmse, test_r2) = calc_error_metrics(y_test, y_pred)
 
-    # Training performance
-    y_train_pred = model.predict(X_train)
+
+    y_train_pred = cv_search.predict(X_train)
     (train_rmse, train_r2) = calc_error_metrics(y_train, y_train_pred)
 
     if plot_path != "":
-        file_name = f"{model_name}_{baseline_corr}.png"
+        file_name = f"{model.name}_{baseline_corr}.png"
         file_path = os.path.join(plot_path, file_name)
-        title = f"{model_name} for {baseline_corr}"
+        title = f"{model.name} for {baseline_corr}"
         create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title)
         plt.savefig(file_path)
         plt.clf()
         print(f"Saving Plot to {file_path}")
 
     return {
-        "model": model,
-        "best_params": model.best_params_,
+        "model": model.name,
+        "best_params": cv_search.best_params_,
         "training_time": training_time,
         "prediction_time": prediction_time,
         "test_rmse": test_rmse,
