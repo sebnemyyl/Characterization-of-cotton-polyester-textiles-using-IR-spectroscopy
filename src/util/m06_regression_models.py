@@ -261,7 +261,12 @@ def calc_error_metrics(actual, predicted):
 
 
 def hyper_param_search(pipeline, model, baseline_corr, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
-    param_grid = combine_cv_search_params(model_params=model.param_distributions)
+    if(model.name == "CNN"):
+        # CNN parameters are loaded directly, because prefix is already added there
+        param_grid = model.param_distributions
+    else:
+        param_grid = combine_cv_search_params(model_params=model.param_distributions)
+    print(param_grid)
     # Enable when you want to use the predefined group split
     #default_cv = prep_util.predefined_group_split(groups_train)
     cv_search = RandomizedSearchCV(pipeline, param_grid, cv=default_cv, n_iter=default_n_iter)
