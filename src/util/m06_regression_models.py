@@ -7,7 +7,7 @@ from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.model_selection import GridSearchCV, KFold, GroupKFold
 from sklearn.model_selection import RandomizedSearchCV, train_test_split, cross_val_score, cross_validate
-from sklearn.neural_network import MLPRegressor  # Import MLPRegressor for neural network
+from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import PLSRegression
@@ -24,6 +24,7 @@ import os
 
 import util.m06_model_prep as prep_util
 import util.m06_cnn_model as cnn_util
+import util.m06_lssvm_model as lssvm_util
 
 default_n_iter = 40
 default_cv = GroupKFold(n_splits=4)
@@ -55,6 +56,22 @@ model_list = [
         }
     ),
     Model(
+        name="SVR sigmoid",
+        sk_model=SVR(cache_size=7000, kernel="sigmoid"),
+        param_distributions={
+            'C': np.logspace(-3, 2, 6),
+            'gamma': np.logspace(-2, 6, 9),
+            'epsilon': np.logspace(-3, 1, 5)
+        },
+    ),
+    Model(
+            name="LSSVM",
+            sk_model=lssvm_util.lssvm_regressor(),
+            param_distributions={
+                'sigma': np.logspace(-2, 2, 5),
+                'gamma': np.logspace(-2, 2, 5)            },
+    ),
+    Model(
         name="Kernel Ridge rbf",
         sk_model=KernelRidge(kernel="rbf"),
         param_distributions={
@@ -62,6 +79,72 @@ model_list = [
             "gamma": np.logspace(-2, 6, 9) # Gamma should be close to median squared pairwise distance
         }
     ),
+    Model(
+        name="Kernel Ridge poly",
+        sk_model=KernelRidge(kernel="poly"),
+        param_distributions={
+            "alpha": np.logspace(-3, 2, 10),
+            'degree': [2, 3, 4, 5]
+        }
+    ),
+    Model(
+        name="KNN",
+        sk_model=KNeighborsRegressor(),
+        param_distributions={
+            'n_neighbors': range(2, 50, 2),
+            'metric': ['euclidean', 'manhattan']
+        }
+    ),
+    Model(
+        name="Random Forest",
+        sk_model= RandomForestRegressor(),
+        param_distributions={
+            "n_estimators": [10, 20, 50, 100, 200, 500],
+            "max_depth": [3, 5, 10, 20, 50, 100, None],
+            "min_samples_split": [2, 5, 10],
+            "min_samples_leaf": [1, 2, 4],
+            "max_features": ["sqrt", "log2", None],
+            "bootstrap": [True, False]
+        }
+    ),
+    Model(
+        name="XGBoost",
+        sk_model= XGBRegressor(),
+        param_distributions={
+             "n_estimators": [100, 200, 300],
+             "max_depth": [3, 5, 7],
+             "learning_rate": [0.01, 0.1, 0.2],
+             "subsample": [0.8, 0.9, 1.0]
+         }
+    ),
+    Model(
+        name= "MLP",
+        sk_model=MLPRegressor(max_iter=1000),
+        param_distributions={
+            'hidden_layer_sizes': [(50,), (100,), (50, 50)],
+            'alpha': [0.0001, 0.001, 0.01],
+            'learning_rate_init': [0.001, 0.01, 0.1],
+            'activation': ['relu', 'tanh']
+    },
+),
+    Model(
+        name="PLS",
+        sk_model= PLSRegression(),
+        param_distributions={
+            'n_components': range(5, 200, 5)
+    },
+),
+
+    Model(
+        name="KNN Minkowski",
+        sk_model= KNeighborsRegressor(metric='minkowski'),
+        param_distributions={
+            'n_neighbors': range(2, 50, 2),
+            'weights': ['uniform', 'distance'],
+            'p': [1, 2]  # p=1 is Manhattan and p=2 is Euclidean
+    },
+
+),
     Model(
         name="CNN",
         sk_model=cnn_util.cnn_regressor,
@@ -76,130 +159,6 @@ def combine_cv_search_params(pca_params={}, model_params={}):
     return {f'pca__{key}': value for key, value in pca_params.items()} | \
            {f'model__{key}': value for key, value in model_params.items()}
 
-# TODO: The models need to be added to model_list instead
-models = {
-    "SVR rbf": RandomizedSearchCV(
-        SVR(cache_size=7000, kernel="rbf"),
-        param_distributions={
-            'C': np.logspace(-3, 2, 6),
-            'gamma': np.logspace(-2, 6, 9),
-            'epsilon': np.logspace(-3, 1, 5)
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "SVR poly": RandomizedSearchCV(
-        SVR(cache_size=7000, kernel='poly'),
-        param_distributions={
-            'C': np.logspace(-3, 2, 6),
-            'gamma': np.logspace(-2, 6, 9) ,
-            'epsilon': np.logspace(-3, 1, 5),
-            'degree': [2, 3, 4, 5]
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "Kernel Ridge rbf": RandomizedSearchCV(
-        KernelRidge(kernel="rbf"),
-        scoring="r2",
-        param_distributions= {
-            "alpha": np.logspace(-3, 2, 6),
-            "gamma": np.logspace(-2, 6, 9) # Gamma should be close to median squared pairwise distance
-        },
-        n_iter=default_n_iter,
-        cv=default_cv,
-        n_jobs=3
-    ),
-    "SVR sigmoid": RandomizedSearchCV(
-        SVR(cache_size=7000, kernel="sigmoid"),
-        param_distributions={
-            'C': np.logspace(-3, 2, 6),
-            'gamma': np.logspace(-2, 6, 9),
-            'epsilon': np.logspace(-3, 1, 5)
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "Kernel Ridge poly": RandomizedSearchCV(
-        KernelRidge(kernel="poly"), # gamma = default (1/n_features)
-        scoring="r2",
-        param_distributions={
-            "alpha": np.logspace(-3, 2, 10),
-            'degree': [2, 3, 4, 5]
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "Random Forest": RandomizedSearchCV(
-        RandomForestRegressor(),
-        param_distributions={
-            "n_estimators": [10, 20, 50, 100, 200, 500],
-            "max_depth": [3, 5, 10, 20, 50, 100, None],
-            "min_samples_split": [2,5,10],
-            "min_samples_leaf": [1, 2, 4],
-            "max_features": ["sqrt", "log2", None],
-            "bootstrap": [True, False]
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "XGBoost": RandomizedSearchCV(
-         XGBRegressor(),
-         param_distributions={
-             "n_estimators": [100, 200, 300],
-             "max_depth": [3, 5, 7],
-             "learning_rate": [0.01, 0.1, 0.2],
-             "subsample": [0.8, 0.9, 1.0]
-         },
-         n_iter=default_n_iter,
-         cv=default_cv
-    ),
-    "MLP": RandomizedSearchCV(
-        MLPRegressor(max_iter=1000),
-        param_distributions={
-            'hidden_layer_sizes': [(50,), (100,), (50, 50)],
-            'alpha': [0.0001, 0.001, 0.01],
-            'learning_rate_init': [0.001, 0.01, 0.1],
-            'activation': ['relu', 'tanh']
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "PLS": RandomizedSearchCV(
-        PLSRegression(),
-        param_distributions={
-            'n_components': range(5, 200, 5)
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "KNN": RandomizedSearchCV(
-        KNeighborsRegressor(),
-        param_distributions={
-            'n_neighbors': range(2, 50, 2),
-            'weights': ['uniform', 'distance'],
-            'metric': ['euclidean', 'manhattan']
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "KNN Minkowski": RandomizedSearchCV(
-        KNeighborsRegressor(metric='minkowski'),
-        param_distributions={
-            'n_neighbors': range(2, 50, 2),
-            'weights': ['uniform', 'distance'],
-            'p': [1, 2]  # p=1 is Manhattan and p=2 is Euclidean
-        },
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-    "CNN": RandomizedSearchCV(
-        cnn_util.cnn_regressor,
-        param_distributions=cnn_util.cnn_params,
-        n_iter=default_n_iter,
-        cv=default_cv
-    ),
-}
 
 def evaluate_error_over_param(model, baseline_corr, param_name, param_list, X_train, X_test, y_train, y_test, plot_path = "", groups_train = None):
     cv_rmse_values = []
@@ -242,12 +201,25 @@ def evaluate_error_over_param(model, baseline_corr, param_name, param_list, X_tr
 
 def create_comparison_plot(plot_path, model_name, baseline_corr, param_name, error_name, param_list, train_values, cv_values, test_values):
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x = param_list, y = train_values, mode="lines+markers", name="Train"))
-    fig.add_trace(go.Scatter(x = param_list, y = cv_values, mode="lines+markers", name="CV"))
-    fig.add_trace(go.Scatter(x = param_list, y = test_values, mode="lines+markers", name="Test"))
-    fig.update_layout(xaxis_title=param_name, xaxis_type="log", xaxis_tickformat="e", yaxis_title=error_name)
-    title = f"{model_name}, {baseline_corr} {error_name} over {param_name}"
-    fig.update_layout(title = title)
+    #fig.add_trace(go.Scatter(x = [d['regularizer'] for d in param_list], y = train_values, mode="lines+markers", name="Train")) for cnn
+    #fig.add_trace(go.Scatter(x = [d['regularizer'] for d in param_list], y = cv_values, mode="lines+markers", name="CV")) for cnn
+    fig.add_trace(go.Scatter(x = [d for d in param_list], y = train_values, mode="lines+markers", name="Train"))
+    fig.add_trace(go.Scatter(x = [d for d in param_list], y = cv_values, mode="lines+markers", name="CV"))
+    #fig.add_trace(go.Scatter(x = param_list, y = test_values, mode="lines+markers", name="Test"))
+    fig.update_layout(xaxis_title=param_name, yaxis_title=error_name.upper())
+    #title = f"{model_name}, {baseline_corr} {error_name} over {param_name}"
+    #fig.update_layout(title = title, plot_bgcolor='white')
+    fig.update_layout(plot_bgcolor='white')
+    fig.update_xaxes(#type="log",
+                     #tickformat=".0e",
+                     showgrid=True,
+                     gridwidth=0.6,
+                     gridcolor='black',
+                     griddash='dash')
+    fig.update_yaxes(showgrid=True,
+                     gridwidth=0.6,
+                     gridcolor='black',
+                     griddash='dash')
     #fig.show()
     file_name = f"{model_name}_{param_name}_{error_name}_{baseline_corr}.png"
     file_path = os.path.join(plot_path, file_name)
@@ -299,6 +271,8 @@ def hyper_param_search(pipeline, model, baseline_corr, X_train, X_test, y_train,
         create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title)
         plt.savefig(file_path)
         plt.clf()
+        if model.name == "PLS":
+            create_and_save_pls_residual_plot(y_test, y_pred, plot_path, model, baseline_corr)
         print(f"Saving Plot to {file_path}")
 
     return {
@@ -313,16 +287,48 @@ def hyper_param_search(pipeline, model, baseline_corr, X_train, X_test, y_train,
         "cv_r2": cv_r2
     }
 
-def create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title = "Prediction plot"):
-    test_pred = plt.scatter(y_test, y_pred, marker="x", c='b')
-    train_pred = plt.scatter(y_train, y_train_pred, marker="o", facecolors='none', edgecolors='g')
-    p1 = max(max(y_pred), max(y_test))
-    p2 = min(min(y_pred), min(y_test))
-    plt.plot([p1, p2], [p1, p2], 'k-')
-    plt.legend((train_pred, test_pred), ("Train", "Test"),loc = "lower right")
-    plt.xlabel("Actual")
-    plt.ylabel("Predicted")
+def create_and_save_pls_residual_plot(y_test, y_pred, plot_path, model, baseline_corr):
+    file_name = f"residual_{model.name}_{baseline_corr}.png"
+    file_path = os.path.join(plot_path, file_name)
+    #title = f"Residual {model.name} for {baseline_corr}"
+    print("Saving residual plot")
+    #y_pred = y_pred.ravel()  # Flatten to 1D
+    residuals = y_test - y_pred
+    sample_idx = np.arange(1, len(y_test) + 1)
+    plt.figure(figsize=(8, 5))
+    plt.scatter(sample_idx, residuals, alpha=0.7)
+    plt.axhline(0, color='red', linestyle='--')
+    plt.xlabel("Predicted values")
+    plt.ylabel("Residuals")
     plt.title(title)
+    plt.grid(True)
+    plt.savefig(file_path)
+    plt.clf()
+
+
+def create_prediction_plot(y_test, y_pred, y_train, y_train_pred, title="Prediction plot"):
+    plt.figure(figsize=(8, 6))
+
+    # Scatter plots
+    train_pred = plt.scatter(y_train, y_train_pred, marker="o", facecolors='none', edgecolors='forestgreen',
+                             label="Train", alpha=0.7)
+    test_pred = plt.scatter(y_test, y_pred, marker="x", c='royalblue', label="Test", alpha=0.9)
+
+    # 1:1 Line
+    p1 = max(max(y_pred), max(y_test), max(y_train_pred), max(y_train))
+    p2 = min(min(y_pred), min(y_test), min(y_train_pred), min(y_train))
+    plt.plot([p1, p2], [p1, p2], 'k--', linewidth=1)
+
+    # Labels and styling
+    plt.xlabel("Actual", fontsize=12)
+    plt.ylabel("Predicted", fontsize=12)
+    #plt.title(title, fontsize=14)
+    plt.legend(loc="upper left", frameon=True)
+    plt.grid(True, linestyle='--', alpha=0.6)
+    plt.tight_layout()
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.box(False)  # cleaner look
 
 
 def evaluate_cv_split(X_train, y_train, groups_train):

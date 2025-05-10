@@ -9,19 +9,38 @@ import util.m00_general_util as util
 import util.m06_regression_models as model_util
 import util.m06_model_prep as prep_util
 import numpy as np
-
+import util.m06_cnn_model as cnn_model
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.kernel_ridge import KernelRidge
+from sklearn.cross_decomposition import PLSRegression
 
-#os.chdir("../..")
+os.chdir("../..")
 print(os.getcwd())
 
 # Settings
 input_dir = "temp/fixed_cotton/input"
 plot_path = "temp/fixed_cotton/plots"
-model = KernelRidge(kernel="polynomial", degree=3)
-param = "alpha"
-param_list = np.geomspace(1e-10, 1.0, 30)
 
+
+## KernelRidge
+# model = KernelRidge( kernel="poly",  alpha=0.01)
+# param = "degree"
+# param_list = np.arange(1,6)
+
+# ## CNN
+# model = cnn_model.cnn_regressor
+# param = "model_kwargs"
+# cnn_params = cnn_model.cnn_params
+# #param_list = np.geomspace(1e-10, 1.0, 30)
+# param_array = np.array([1e-1, 1e-2, 1e-3, 1e-4, 1e-5])
+# param_list = [{"regularizer": val} for val in param_array]
+# print(param_list)
+# model.set_params(fit_kwargs={"epochs": 20})
+
+
+model = KNeighborsRegressor(metric='manhattan')
+param = "n_neighbors"
+param_list = np.arange(2, 50, 2)
 
 csv_files = util.get_files(input_dir)
 output = []

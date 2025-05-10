@@ -6,15 +6,13 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 from scipy import stats
 import matplotlib.cm as cm
-import importlib.util
-# spec = importlib.util.spec_from_file_location("plot_p_values", "util\\05_data_analysis_plot_jackknife.py")
 # plot_p_val = importlib.util.module_from_spec(spec)
 from scipy.signal import find_peaks
 import re
 from scipy import stats
 
 print(os.getcwd())
-my_path = "../temp/reproducibility/new/no_bsn"
+my_path = "../input/clean_csv/resampling/fillpeaks/"
 
 variance_dic = {}
 rsd_dic = {}
@@ -73,9 +71,9 @@ def run_bootstrap(absorb_val_by_peaks):
 
         lower_percentile = np.percentile(bootstrap_means, 2.5)
         upper_percentile = np.percentile(bootstrap_means, 97.5)
-        margin_of_error = (upper_percentile - lower_percentile) / 2
+        margin_of_error = (upper_percentile - lower_percentile)/2
 
-        threshold = (full_data_mean * 0.05) / 2
+        threshold = (full_data_mean * 0.05)
         if margin_of_error <= threshold:
             print(f"Minimum sample size: {L}")
             return L  # This sample size is statistically representative
@@ -93,7 +91,7 @@ for iteration in range(10):
             if file.endswith(".csv"):
                 print(f"Iteration {iteration}, processing file: {file}")
                 # Load the data
-                data = pd.read_csv(f'../temp/reproducibility/new/no_bsn/{file}', sep=',', header=0)
+                data = pd.read_csv(f'../input/clean_csv/resampling/fillpeaks/{file}', sep=',', header=0)
                 related_data = data[data['reference.specimen'].isin([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])]
                 related_data = related_data.drop(
                     ['reference.pet', 'reference.cotton', 'reference.area', 'reference.spot',
@@ -101,6 +99,10 @@ for iteration in range(10):
 
                 specimens = related_data[related_data.columns[0]]
                 (sorted_peak_indices, key_wavenumbers) = find_key_wavenumbers(related_data)
+                #sorted_peak_indices = np.array([22,21,31,25,24,28,27,26,30,29])
+                #key_wavenumbers = ['spectra.3807.1', 'spectra.4023.1', 'spectra.4088.68', 'spectra.4177.39', 'spectra.4246.82', 'spectra.4285.4',  'spectra.4404.97',  'spectra.4431.97',  'spectra.4636.4', 'spectra.4690.41']
+
+
                 result_series = get_spectra_from_key_wavenumbers(related_data, key_wavenumbers)
 
                 for wn_index, wn in enumerate(key_wavenumbers):
@@ -172,17 +174,32 @@ colors = cm.tab10(np.linspace(0.1, 0.4, len(unique_file_names)))
 color_map = dict(zip(unique_file_names, colors))
 point_colors = [color_map[file] for file in numbers]
 
-# Create scatter plot
-plt.figure(figsize=(10, 6))
-plt.scatter(spectra_values, avg_bootstrap_values, c=point_colors, marker='o')
+#spectra_labels = [int(val) for val in spectra_values]
+#spectra_labels = [str(val) for val in spectra_labels]
 
-plt.xlabel('Wavenumbers')
-plt.ylabel('Avg Min Sample Size (100 Iterations)')
-plt.title('Average Minimum Spot Number Required to Measure for Different Samples (SNV Applied)')
+# Step 1: Get unique sorted wavenumbers
+unique_wavenumbers = sorted(set(spectra_values))
 
-# Create a legend for file names
-handles = [plt.Line2D([0], [0], marker='o', color=color_map[file], linestyle='', markersize=10) for file in
-           unique_file_names]
-plt.legend(handles, unique_file_names_with_text, title="File Names", loc='best')
+# Step 2: Map each wavenumber to a position index
+wavenumber_to_x = {w: i for i, w in enumerate(unique_wavenumbers)}
+x_positions = [wavenumber_to_x[val] for val in spectra_values]  # all x values as positions
 
+# Step 3: Plot using mapped positions
+plt.figure(figsize=(14, 6))
+plt.scatter(x_positions, avg_bootstrap_values, c=point_colors, marker='o')
+
+# Step 4: Set the x-axis ticks and labels
+plt.xticks(ticks=range(len(unique_wavenumbers)), labels=[str(int(w)) for w in unique_wavenumbers], rotation=90)
+
+# Labels and title
+plt.xlabel('Peak Wavenumbers')
+plt.ylabel('Avg Min Sample Size (1000 Iterations)')
+plt.title('Average Minimum Numer of Spots Calculated for Peak Wavenumbers')
+
+# Legend
+handles = [plt.Line2D([0], [0], marker='o', color=color_map[file], linestyle='', markersize=10)
+           for file in unique_file_names]
+plt.legend(handles, unique_file_names_with_text, title="Sample", loc='lower right')
+
+plt.tight_layout()
 plt.show()
