@@ -53,7 +53,7 @@ def split_feature_set_randomly(data_clean, test_size = 0.2):
 def split_feature_set_with_attribute(data_clean, selected_attribute = 'reference.specimen', test_value = 1):
     # Put all measurements of certain column into test data set
     test_data = data_clean.loc[data_clean[selected_attribute] == test_value]
-    print(f"number of samples in test: {len(np.unique(test_data["reference.cotton"]))}")
+    print(f"number of samples in test: {len(np.unique(test_data['reference.cotton']))}")
     X_test = get_X(test_data)
     training_data = data_clean[~data_clean.isin(test_data)].dropna()  
     groups_train = get_groups(training_data)

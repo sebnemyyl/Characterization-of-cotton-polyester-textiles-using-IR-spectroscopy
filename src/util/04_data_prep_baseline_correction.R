@@ -1,11 +1,7 @@
 # Load packages
-Packages <- c("plyr","dplyr","IDPmisc","prospectr","dendextend","baseline",
-              "pls","plotrix","knitr","ggplot2", "gridExtra",
-              "ChemoSpec", "matrixStats", "stringr", "MASS", "caret", "reshape2")
-
-for (p in Packages) {
-  library(p, character.only = TRUE)
-}
+library(dplyr)
+library(prospectr)
+library(baseline)
 
 # Standard Normal Variate
 stdnormalvariate <- function(spectra_df) {
