@@ -8,22 +8,15 @@ from itertools import product
 
 import numpy as np
 
-def create_cnn(X, y, optimizer):
+def create_cnn(X, y, optimizer="adam", dropout_rate = 0.3, l2_reg=0.01):
     features_normalized = X[:, :, np.newaxis]
     print(f"Using optimizer: {optimizer} with {len(X)} values")
-    dropout_rate = 0.3
     model = Sequential([
         Input(shape=(features_normalized.shape[1], 1)),
-        Conv1D(filters=32, kernel_size=7, activation='relu', kernel_regularizer=l2(0.01)),
-        MaxPooling1D(pool_size=2),
-        Conv1D(filters=64, kernel_size=7, activation='relu', kernel_regularizer=l2(0.001)),
-        MaxPooling1D(pool_size=2),
-        Conv1D(filters=128, kernel_size=5, activation='relu', kernel_regularizer=l2(0.001)),
+        Conv1D(filters=64, kernel_size=5, activation='relu', kernel_regularizer=l2(l2_reg)),
         MaxPooling1D(pool_size=2),
         Flatten(),
-        Dense(512, activation='relu', kernel_regularizer=l2(0.01)),
-        Dropout(dropout_rate),
-        Dense(256, activation='relu', kernel_regularizer=l2(0.01)),
+        Dense(128, activation='relu', kernel_regularizer=l2(l2_reg)),
         Dropout(dropout_rate),
         Dense(1)  # Regression output
     ])
@@ -81,11 +74,11 @@ def get_grid_from_dicts(prefix="", model_kwargs=None, fit_kwargs=None):
 
 # Every param here needs to be defined in function create_cnn
 model_kwargs = {
-    "optimizer": ["adam", "rmsprop"]
+    "optimizer": ["adam"]
 }
 
 fit_kwargs = {
-    "epochs": [10, 20]
+    "epochs": [50]
 }
 
 cnn_params = get_grid_from_dicts(

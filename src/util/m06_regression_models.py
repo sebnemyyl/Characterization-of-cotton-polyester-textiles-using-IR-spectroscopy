@@ -201,8 +201,8 @@ def evaluate_error_over_param(model, baseline_corr, param_name, param_list, X_tr
 
 def create_comparison_plot(plot_path, model_name, baseline_corr, param_name, error_name, param_list, train_values, cv_values, test_values):
     fig = go.Figure()
-    #fig.add_trace(go.Scatter(x = [d['regularizer'] for d in param_list], y = train_values, mode="lines+markers", name="Train")) for cnn
-    #fig.add_trace(go.Scatter(x = [d['regularizer'] for d in param_list], y = cv_values, mode="lines+markers", name="CV")) for cnn
+    #param_name = 'dropout_rate' # change param name for CNN
+    #param_list = [p[param_name] for p in param_list] # map param name for CNN
     fig.add_trace(go.Scatter(x = [d for d in param_list], y = train_values, mode="lines+markers", name="Train"))
     fig.add_trace(go.Scatter(x = [d for d in param_list], y = cv_values, mode="lines+markers", name="CV"))
     #fig.add_trace(go.Scatter(x = param_list, y = test_values, mode="lines+markers", name="Test"))

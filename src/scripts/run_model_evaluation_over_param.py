@@ -14,12 +14,12 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.cross_decomposition import PLSRegression
 
-os.chdir("../..")
+#os.chdir("../..")
 print(os.getcwd())
 
 # Settings
-input_dir = "temp/fixed_cotton/input"
-plot_path = "temp/fixed_cotton/plots"
+input_dir = "temp/cnn_test/input"
+plot_path = "temp/cnn_test/plots"
 
 
 ## KernelRidge
@@ -28,19 +28,16 @@ plot_path = "temp/fixed_cotton/plots"
 # param_list = np.arange(1,6)
 
 # ## CNN
-# model = cnn_model.cnn_regressor
-# param = "model_kwargs"
-# cnn_params = cnn_model.cnn_params
-# #param_list = np.geomspace(1e-10, 1.0, 30)
-# param_array = np.array([1e-1, 1e-2, 1e-3, 1e-4, 1e-5])
-# param_list = [{"regularizer": val} for val in param_array]
-# print(param_list)
-# model.set_params(fit_kwargs={"epochs": 20})
+model = cnn_model.cnn_regressor
+param = "model_kwargs"
+param_array = np.array([0.1, 0.2, 0.3])
+param_list = [{"dropout_rate": val} for val in param_array]
+#model.set_params(fit_kwargs={"epochs": 20})
 
 
-model = KNeighborsRegressor(metric='manhattan')
-param = "n_neighbors"
-param_list = np.arange(2, 50, 2)
+#model = KNeighborsRegressor(metric='manhattan')
+#param = "n_neighbors"
+#param_list = np.arange(2, 50, 2)
 
 csv_files = util.get_files(input_dir)
 output = []
