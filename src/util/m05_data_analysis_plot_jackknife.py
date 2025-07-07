@@ -78,14 +78,16 @@ def plot_resampling_top_n(loaded_dict , type='jackknife'):
         plt.xlabel('Left-out spot')
         plt.ylabel('Relative Std Dev')
         plt.grid(True)
-        plt.legend(loc="upper right")
+        #plt.legend(loc="upper right")
+        plt.tight_layout()
         plt.show()
     elif type == 'bootstrap':
         plt.title(f'Bootstrap Sampling by top 10 wavenumbers')
         plt.xlabel('Resample size')
         plt.ylabel('Relative Std Dev')
         plt.grid(True)
-        plt.legend(loc="upper right")
+        plt.legend(bbox_to_anchor=(1, 0.7), loc="center left")
+        plt.tight_layout()
         plt.gca().invert_xaxis()
         plt.show()
 

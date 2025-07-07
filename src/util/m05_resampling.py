@@ -52,21 +52,22 @@ def get_spectra_from_key_wavenumbers(data, key_wavenumbers):
     return result_series
 
 def bootstrap_resampling(data, n_iterations):
-    n = 10000
+    n = 1000
     bootstrap_samples = np.random.choice(data, (n_iterations, n), replace=True)
     return bootstrap_samples
 
 def run_jackknife(absorb_val_by_peaks):
-    group_size_leave_out = 2
+    group_size_leave_out = 0
     jackknife_by_specimen = {}  # to be refreshed each specimen and collect avg variance
     for L in range(0, len(absorb_val_by_peaks) - group_size_leave_out):
+        print(f"the L {L}")
         # len(absorb_val_by_peaks) is the number of spots measured
         jackknife_est_var = []
         # Generate all the combinations of given L
         index_combinations = list(itertools.combinations(np.where(absorb_val_by_peaks)[0], L)) #np.arrange
         print(f"the combinations  {np.where(absorb_val_by_peaks)[0]}")
         print(f"absorb_val_by_peaks {absorb_val_by_peaks}")
-        #print(f"{L} has number of index combinations: {len(index_combinations)}")
+        print(f"{L} has number of index combinations: {len(index_combinations)}")
         for indices_to_leave_out in index_combinations:
             # print(indices_to_leave_out)
             X_reduced = np.delete(absorb_val_by_peaks, indices_to_leave_out, axis=0)
@@ -106,7 +107,6 @@ def are_spots_per_specimen_equal(df):
         print(spots_per_specimen_df)
     return all_counts_equal
 
-# TODO consider deleting, because not really useful 
 def approximate_required_spots(absorb_val_by_peaks):
     Z = 1.96  # Z-score for 95% confidence level
     E = 0.005  # Margin of error
@@ -121,7 +121,8 @@ def resample_csv_file(csv_file, cotton = -1, type = "bootstrap", output_dir=".")
     #cotton_contents = related_data['reference.cotton'].unique() # contents: [50 23 35 30 25]
     related_data = data
     if cotton > 0:
-        related_data = related_data.query(f"`reference.cotton` == {cotton}") 
+        related_data = related_data.query(f"`reference.cotton` == {cotton}")
+    related_data = related_data[related_data['reference.spot'] <= 20]
     related_data = related_data.drop(['reference.pet', 'reference.cotton', 'reference.area', 'reference.spot',
                                               'reference.measuring_date', 'Unnamed: 0'], axis=1)
 
