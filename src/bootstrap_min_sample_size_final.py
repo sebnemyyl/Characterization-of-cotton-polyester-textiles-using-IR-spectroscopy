@@ -177,18 +177,18 @@ point_colors = [color_map[file] for file in numbers]
 #spectra_labels = [int(val) for val in spectra_values]
 #spectra_labels = [str(val) for val in spectra_labels]
 
-# Step 1: Get unique sorted wavenumbers
+# Get unique sorted wavenumbers
 unique_wavenumbers = sorted(set(spectra_values))
 
-# Step 2: Map each wavenumber to a position index
+# Map each wavenumber to a position index
 wavenumber_to_x = {w: i for i, w in enumerate(unique_wavenumbers)}
 x_positions = [wavenumber_to_x[val] for val in spectra_values]  # all x values as positions
 
-# Step 3: Plot using mapped positions
+# Plot using mapped positions
 plt.figure(figsize=(14, 6))
 plt.scatter(x_positions, avg_bootstrap_values, c=point_colors, marker='o')
 
-# Step 4: Set the x-axis ticks and labels
+# Set the x-axis ticks and labels
 plt.xticks(ticks=range(len(unique_wavenumbers)), labels=[str(int(w)) for w in unique_wavenumbers], rotation=90)
 
 # Labels and title

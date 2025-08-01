@@ -13,6 +13,7 @@ from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import PLSRegression
 from scipy.spatial.distance import pdist
 from xgboost import XGBRegressor
+from xgboost import plot_importance
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
 import plotly.graph_objects as go
@@ -111,10 +112,10 @@ model_list = [
         name="XGBoost",
         sk_model= XGBRegressor(),
         param_distributions={
-             "n_estimators": [100, 200, 300],
-             "max_depth": [3, 5, 7],
-             "learning_rate": [0.01, 0.1, 0.2],
-             "subsample": [0.8, 0.9, 1.0]
+             "n_estimators": [200],#, 200, 300],
+             "max_depth": [6],#, 5, 7],
+             "learning_rate": [0.1], #, 0.1, 0.05, 0.2],
+             "subsample": [0.8]#, 0.9, 1.0]
          }
     ),
     Model(
@@ -274,6 +275,10 @@ def hyper_param_search(pipeline, model, baseline_corr, X_train, X_test, y_train,
         if model.name == "PLS":
             create_and_save_pls_residual_plot(y_test, y_pred, plot_path, model, baseline_corr)
         print(f"Saving Plot to {file_path}")
+        if model.name == "XGBoost":
+            file_name = f"{model.name}_feature_importance_{baseline_corr}.png"
+            xgboostplot_importance(cv_search.best_estimator_, feature_names=X_train.columns, plot_path=plot_path,
+                                   filename=file_name)
 
     return {
         "model": model.name,
@@ -351,3 +356,32 @@ def median_squared_pairwise_distance(X):
     squared_distances = pairwise_distances ** 2
     # Return the median of the squared distances
     return np.median(squared_distances)
+
+def xgboostplot_importance(model_pipeline, feature_names=None, plot_path="", filename="xgboost_feature_importance.png"):
+    try:
+        booster = model_pipeline.named_steps["model"].get_booster()
+        if feature_names is not None:
+            feature_names = [str(int(float(f))) for f in feature_names]
+            booster.feature_names = feature_names
+    except AttributeError:
+        print("Could not extract booster from model. Feature importance will not be plotted.")
+        return
+
+    importance = booster.get_score(importance_type="gain")
+    for key in importance.keys():
+        importance[key] = round(importance[key], 2)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    plot_importance(importance, importance_type="gain", max_num_features=20, ax=ax, color="royalblue")
+    ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.6)
+    ax.legend().set_visible(False)
+    plt.box(False)
+    plt.tight_layout()
+
+    if plot_path:
+        save_path = os.path.join(plot_path, filename)
+        plt.savefig(save_path)
+        print(f"XGBoost feature importance plot saved to {save_path}")
+        plt.clf()
+    else:
+        plt.show()
