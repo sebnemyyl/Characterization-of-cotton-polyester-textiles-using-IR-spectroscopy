@@ -12,7 +12,7 @@ import re
 from scipy import stats
 
 print(os.getcwd())
-my_path = "../input/clean_csv/resampling/fillpeaks/"
+my_path = "../../../input/clean_csv/resampling/fillpeaks/"
 
 variance_dic = {}
 rsd_dic = {}

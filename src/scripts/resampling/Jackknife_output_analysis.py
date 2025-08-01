@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.cm as cm
 
 # Load jackknife and bootstrap results
-jackknife_path = '../temp/jackknife/060725/jackknife_spectra_reproducibility_50_10specimen.pkl'
-bootstrap_path = '../temp/bootstrap/bootstrap_spectra_reproducibility_50_10specimen.pkl'
+jackknife_path = '../../../temp/jackknife/060725/jackknife_spectra_reproducibility_50_10specimen.pkl'
+bootstrap_path = '../../../temp/bootstrap/bootstrap_spectra_reproducibility_50_10specimen.pkl'
 
 jackknife_data = pickle.load(open(jackknife_path, "rb"))
 bootstrap_data = pickle.load(open(bootstrap_path, "rb"))

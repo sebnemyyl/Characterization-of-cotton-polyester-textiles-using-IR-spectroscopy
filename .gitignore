@@ -10,3 +10,4 @@ src/.Rhistory
 *.yml
 playground/
 src/notebooks/.ipynb_checkpoints/
+.RData

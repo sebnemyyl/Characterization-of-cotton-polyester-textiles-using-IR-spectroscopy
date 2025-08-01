@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 print(os.getcwd())
-my_path = "../temp/jackknife"
+my_path = "../../../temp/jackknife"
 #os.chdir("")
 
 def get_csv_files(path):
@@ -23,7 +23,7 @@ def get_csv_files(path):
 
 
 # Load the dictionary from a file
-with open('../temp/bootstrap/bootstrap_spectra_treated_als_50_cotton_nir.csv.pkl', 'rb') as f:
+with open('../../../temp/bootstrap/bootstrap_spectra_treated_als_50_cotton_nir.csv.pkl', 'rb') as f:
     loaded_dict = pickle.load(f)
 
 # Dictionary to store p-values for each specimen, grouped by spectrum
