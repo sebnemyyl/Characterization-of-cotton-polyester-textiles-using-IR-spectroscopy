@@ -1,10 +1,12 @@
+import os
+os.chdir("../../..")
+# Make sure working directory is root folder
+print(os.getcwd())
+
 import sys
 # Needed for Python to find the util modules
 sys.path.insert(0, "src")
-sys.path.insert(0, "..")
 
-
-import os
 import json
 import util.m00_general_util as util
 import util.m06_regression_models as model_util
@@ -15,8 +17,6 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
-#os.chdir("../..")
-print(os.getcwd())
 input_dir = "temp/fixed_cotton/input"
 models = ["CNN"]
 output_file = "temp/fixed_cotton/model_output_test_kernel.json"

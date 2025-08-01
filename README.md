@@ -36,10 +36,10 @@ the data provided in the `input` many different data exploration and machine lea
 workflows can be enabled. Some sample workflows are described here:
 
 ### Preprocess raw spectra data
-1. Run the R script [clean_up_spectra.R](src/scripts/clean_up_spectra.R): Set a csv-file from `input/raw_csv` 
+1. Run the R script [clean_up_spectra.R](src/scripts/preprocessing/clean_up_spectra.R): Set a csv-file from `input/raw_csv` 
 as `input_path` and define the desired `output_path`. Define whether the waterband
 should be removed and further filtering of the data.
-2. Run the R script [baseline_correction.R](src/scripts/baseline_correction.R): Use the resulting csv_file from the 
+2. Run the R script [baseline_correction.R](src/scripts/preprocessing/baseline_correction.R): Use the resulting csv_file from the 
 previous step as input `csv_path`. Define an existing empty folder as `output_dir` 
 and define a list of baseline correction methods in `baseline_corr_types`. After
 running the script a list of csv-files with baseline corrected spectra is generated
@@ -48,7 +48,7 @@ in the `output_dir`.
 in regression models.
 
 ### Evaluate regression models
-1. Run the script [run_hyper_param_search.py](src/scripts/run_hyper_param_search.py): 
+1. Run the script [run_hyper_param_search.py](src/scripts/models/run_hyper_param_search.py): 
 A regression model pipeline is provided in the script . A folder with preprocessed 
 spectral data (csv-files) should be used as input (e.g. by following the steps above). 
 Settings of the pipeline can be set, e.g. whether to use PCA or to scale the data 
@@ -58,6 +58,6 @@ the script, a JSON file with the best performing results and parameters is gener
 [m06_model_plotting.py](src/util/m06_model_plotting.py). This can be done in a Jupyter notebook 
 (e.g. [model_evaluation.ipynb](src/notebooks/model_evaluation.ipynb)) or via custom scripts.
 3. For further analysis on how model parameters behave, 
-the script [run_model_evaluation_over_param.py](src/scripts/run_model_evaluation_over_param.py) 
+the script [run_model_evaluation_over_param.py](src/scripts/models/run_model_evaluation_over_param.py) 
 can be run. It runs a specific model over a self-defined list of parameters and
 plots how the error changes based on the parameter.

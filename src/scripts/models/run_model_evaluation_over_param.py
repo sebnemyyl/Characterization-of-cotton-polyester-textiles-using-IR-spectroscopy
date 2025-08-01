@@ -1,10 +1,11 @@
+import os
+os.chdir("../../..")
+print(os.getcwd())
+
 import sys
 # Needed for Python to find the util modules
 sys.path.insert(0, "src")
-sys.path.insert(0, "..")
 
-
-import os
 import util.m00_general_util as util
 import util.m06_regression_models as model_util
 import util.m06_model_prep as prep_util
@@ -14,8 +15,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.cross_decomposition import PLSRegression
 
-#os.chdir("../..")
-print(os.getcwd())
+
 
 # Settings
 input_dir = "temp/cnn_test/input"
