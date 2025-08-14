@@ -17,10 +17,10 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
-input_dir = "temp/fixed_cotton/input"
+input_dir = "temp/spectra_treated/mir/regression"
 models = ["CNN"]
-output_file = "temp/fixed_cotton/model_output_test_kernel.json"
-plot_path = "temp/fixed_cotton/plots"
+output_file = "temp/MIR_results/model_output_cnn_mir.json"
+plot_path = "temp/MIR_results"
 
 specimen_split = {"type": "attribute", "attribute": "reference.specimen", "test_value": 1 }
 random_split = {"type": "random", "test_size": 0.25 }

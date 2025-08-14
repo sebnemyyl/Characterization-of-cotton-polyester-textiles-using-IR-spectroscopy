@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout, MaxPooling1D
+from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout, MaxPooling1D, BatchNormalization
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.metrics import RootMeanSquaredError
 from tensorflow.keras.layers import Input
@@ -8,23 +8,64 @@ from itertools import product
 
 import numpy as np
 
-def create_cnn(X, y, optimizer="adam", dropout_rate = 0.3, l2_reg=0.01):
-    features_normalized = X[:, :, np.newaxis]
-    print(f"Using optimizer: {optimizer} with {len(X)} values")
+
+def mvn_augment(X, n_augmented=2):
+    X_centered = X - X.mean(axis=0)
+    cov_matrix = np.cov(X_centered.T)
+    augmented = []
+    for x in X:
+        for _ in range(n_augmented):
+            noise = np.random.multivariate_normal(mean=np.zeros(X.shape[1]), cov=cov_matrix)
+            augmented.append(x + noise)
+    X_aug = np.array(augmented)
+    X_combined = np.concatenate([X, X_aug], axis=0)
+    return X_combined
+
+
+def add_snr_noise(signal, snr_db):
+    # Add Gaussian noise to signal at specified SNR in dB.
+    signal_power = np.mean(signal ** 2)
+    snr_linear = 10 ** (snr_db / 10)
+    noise_power = signal_power / snr_linear
+    noise = np.random.normal(0, np.sqrt(noise_power), size=signal.shape)
+    return signal + noise
+
+
+def create_cnn(X, y, optimizer, regularizer, kernel):
+    # X_aug = mvn_augment(X, n_augmented=2)
+    X_snr_aug = np.array([add_snr_noise(spectrum, snr_db=np.random.uniform(15, 30))
+                          for spectrum in X])
+    y_aug = np.tile(y, 3)
+
+    features_normalized = X_snr_aug[:, :, np.newaxis]
+    print(f"Using optimizer: {optimizer} with {len(X_snr_aug)} values")
+    # dropout_rate = 0.3
     model = Sequential([
         Input(shape=(features_normalized.shape[1], 1)),
-        Conv1D(filters=64, kernel_size=5, activation='relu', kernel_regularizer=l2(l2_reg)),
+
+        Conv1D(filters=64, kernel_size=kernel, activation='relu', padding='same', kernel_regularizer=l2(regularizer)),
+        BatchNormalization(),
         MaxPooling1D(pool_size=2),
+
+        Conv1D(filters=64, kernel_size=kernel, activation='relu', padding='same', kernel_regularizer=l2(regularizer)),
+        BatchNormalization(),
+
+        # Conv1D(filters=64, kernel_size=kernel, activation='relu', padding='same', kernel_regularizer=l2(regularizer)),
+        # BatchNormalization(),
+
         Flatten(),
-        Dense(128, activation='relu', kernel_regularizer=l2(l2_reg)),
-        Dropout(dropout_rate),
-        Dense(1)  # Regression output
+
+        Dense(128, activation='relu', kernel_regularizer=l2(regularizer)),
+        Dropout(0.3),
+        Dense(1)
     ])
+    model.summary()
     model.compile(optimizer=optimizer, loss='mse', metrics=[RootMeanSquaredError()])
     return model
 
+
 cnn_regressor = SKLearnRegressor(
-    model=create_cnn 
+    model=create_cnn
 )
 
 # Copied from https://github.com/keras-team/keras/pull/20599#issuecomment-2698338920
@@ -74,11 +115,14 @@ def get_grid_from_dicts(prefix="", model_kwargs=None, fit_kwargs=None):
 
 # Every param here needs to be defined in function create_cnn
 model_kwargs = {
-    "optimizer": ["adam"]
+    "optimizer": ["adam"],
+    "regularizer": [0.001],
+    "kernel": [5]
 }
 
 fit_kwargs = {
-    "epochs": [50]
+    "epochs": [50],
+    "batch_size": [8]
 }
 
 cnn_params = get_grid_from_dicts(

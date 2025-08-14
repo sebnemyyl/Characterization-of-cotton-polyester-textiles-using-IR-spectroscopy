@@ -100,7 +100,7 @@ model_list = [
         name="Random Forest",
         sk_model= RandomForestRegressor(),
         param_distributions={
-            "n_estimators": [10, 20, 50, 100, 200, 500],
+            "n_estimators": [10, 20, 50, 100, 200],
             "max_depth": [3, 5, 10, 20, 50, 100, None],
             "min_samples_split": [2, 5, 10],
             "min_samples_leaf": [1, 2, 4],
@@ -112,10 +112,10 @@ model_list = [
         name="XGBoost",
         sk_model= XGBRegressor(),
         param_distributions={
-             "n_estimators": [200],#, 200, 300],
-             "max_depth": [6],#, 5, 7],
-             "learning_rate": [0.1], #, 0.1, 0.05, 0.2],
-             "subsample": [0.8]#, 0.9, 1.0]
+             "n_estimators": [100, 200, 300],
+             "max_depth": [5, 6, 7],
+             "learning_rate": [0.1, 0.05, 0.2],
+             "subsample": [0.8, 0.9, 1.0]
          }
     ),
     Model(
@@ -132,7 +132,7 @@ model_list = [
         name="PLS",
         sk_model= PLSRegression(),
         param_distributions={
-            'n_components': range(5, 200, 5)
+            'n_components': np.arange(1, 20, 1, dtype=int)
     },
 ),
 
@@ -185,7 +185,8 @@ def evaluate_error_over_param(model, baseline_corr, param_name, param_list, X_tr
         print(cv_rmse_scores)
         print(f"{param_name} {param_value} has RMSE Score: {cv_rmse} with std dev: {rmse_std} ({std_percentage}%)")
 
-        model.fit(X_train, y_train)
+        result = model.fit(X_train, y_train)
+        #cnn_loss_plot(result, plot_path) # Activate to plot CNN loss curve
         train_pred = model.predict(X_train)
         (train_rmse, train_r2) = calc_error_metrics(y_train, train_pred)
         test_pred = model.predict(X_test)
@@ -200,12 +201,31 @@ def evaluate_error_over_param(model, baseline_corr, param_name, param_list, X_tr
     create_comparison_plot(plot_path, model_name, baseline_corr, param_name, "rmse", param_list, train_rmse_values, cv_rmse_values, test_rmse_values)
     create_comparison_plot(plot_path, model_name, baseline_corr, param_name, "r2", param_list, train_r2_values, cv_r2_values, test_r2_values)
 
+
+def cnn_loss_plot(result, plot_path):
+    plt.figure(figsize=(8, 5))
+    plt.plot(result.history_.history['loss'], label='Train Loss', color='royalblue')
+    #plt.plot(result.history_.history['val_loss'], label='Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.ylim([-5, 100])
+    #plt.title('Training and Validation Loss')
+    #plt.legend()
+    plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7)
+    plt.tight_layout()
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
+    plt.box(False)
+    file_path = os.path.join(plot_path, "cnn_test.png")
+    plt.savefig(file_path)
+
 def create_comparison_plot(plot_path, model_name, baseline_corr, param_name, error_name, param_list, train_values, cv_values, test_values):
     fig = go.Figure()
     #param_name = 'dropout_rate' # change param name for CNN
     #param_list = [p[param_name] for p in param_list] # map param name for CNN
     fig.add_trace(go.Scatter(x = [d for d in param_list], y = train_values, mode="lines+markers", name="Train"))
     fig.add_trace(go.Scatter(x = [d for d in param_list], y = cv_values, mode="lines+markers", name="CV"))
+    fig.add_trace(go.Scatter(x = [d for d in param_list], y = test_values, mode="lines+markers", name="Test"))
     #fig.add_trace(go.Scatter(x = param_list, y = test_values, mode="lines+markers", name="Test"))
     fig.update_layout(xaxis_title=param_name, yaxis_title=error_name.upper())
     #title = f"{model_name}, {baseline_corr} {error_name} over {param_name}"
