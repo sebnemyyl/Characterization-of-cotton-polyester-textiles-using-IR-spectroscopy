@@ -1,0 +1,33 @@
+[
+    {
+        "model": "Random Forest",
+        "baseline_corr": "none",
+        "Test_RMSE": 2.5126093558655778,
+        "Test_R2": 0.8716286483660185,
+        "Train_RMSE": 0.8443735275507034,
+        "Train_R2": 0.9830905840006234,
+        "CV_R2": 0.7721394473067645,
+        "training_time": 1249.4505941867828,
+        "prediction_time": 0.022224903106689453,
+        "best_params": {
+            "model__n_estimators": 100,
+            "model__min_samples_split": 10,
+            "model__min_samples_leaf": 2,
+            "model__max_features": "log2",
+            "model__max_depth": 20,
+            "model__bootstrap": false
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    }
+]

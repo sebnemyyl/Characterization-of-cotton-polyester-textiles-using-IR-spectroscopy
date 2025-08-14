@@ -1,0 +1,272 @@
+[
+    {
+        "model": "KNN",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 1.2031028576606038,
+        "Test_R2": 0.9620948756961007,
+        "Train_RMSE": 0.4791323314130357,
+        "Train_R2": 0.9936632937733733,
+        "CV_R2": 0.9040892980951023,
+        "training_time": 4.9365620613098145,
+        "prediction_time": 0.01740241050720215,
+        "best_params": {
+            "model__n_neighbors": 6,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "none",
+        "Test_RMSE": 2.3430227805123875,
+        "Test_R2": 0.8562375614752527,
+        "Train_RMSE": 0.5878003791375825,
+        "Train_R2": 0.9904629877189844,
+        "CV_R2": 0.8243368476895093,
+        "training_time": 3.325881242752075,
+        "prediction_time": 0.019810914993286133,
+        "best_params": {
+            "model__n_neighbors": 2,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "snv",
+        "Test_RMSE": 1.4135670518231533,
+        "Test_R2": 0.9476730723407852,
+        "Train_RMSE": 0.8339923356200682,
+        "Train_R2": 0.9808010827319894,
+        "CV_R2": 0.9085217166814843,
+        "training_time": 3.4925947189331055,
+        "prediction_time": 0.01787114143371582,
+        "best_params": {
+            "model__n_neighbors": 10,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "msc",
+        "Test_RMSE": 1.5503782759279714,
+        "Test_R2": 0.9370540551055367,
+        "Train_RMSE": 1.0971152340272625,
+        "Train_R2": 0.9667756028744733,
+        "CV_R2": 0.9096097885572039,
+        "training_time": 3.306201219558716,
+        "prediction_time": 0.015540599822998047,
+        "best_params": {
+            "model__n_neighbors": 14,
+            "model__metric": "euclidean"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "detrend3",
+        "Test_RMSE": 1.236719989865666,
+        "Test_R2": 0.9599469890175187,
+        "Train_RMSE": 0.40516637665156696,
+        "Train_R2": 0.9954687355031575,
+        "CV_R2": 0.9126444647439178,
+        "training_time": 2.9513931274414062,
+        "prediction_time": 0.012837648391723633,
+        "best_params": {
+            "model__n_neighbors": 6,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 1.5223239224948146,
+        "Test_R2": 0.9393114791348867,
+        "Train_RMSE": 0.314681475808366,
+        "Train_R2": 0.9972666517060922,
+        "CV_R2": 0.9226938903152803,
+        "training_time": 3.1493892669677734,
+        "prediction_time": 0.01889657974243164,
+        "best_params": {
+            "model__n_neighbors": 6,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "als",
+        "Test_RMSE": 1.576048500205498,
+        "Test_R2": 0.9349523569983906,
+        "Train_RMSE": 0.6148856825112453,
+        "Train_R2": 0.9895638243614924,
+        "CV_R2": 0.8967472704325575,
+        "training_time": 3.3641650676727295,
+        "prediction_time": 0.02103900909423828,
+        "best_params": {
+            "model__n_neighbors": 12,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 1.3242384887171954,
+        "Test_R2": 0.9540775741803323,
+        "Train_RMSE": 0.6927980133499139,
+        "Train_R2": 0.9867515251561478,
+        "CV_R2": 0.9037334755940968,
+        "training_time": 3.2756268978118896,
+        "prediction_time": 0.01622748374938965,
+        "best_params": {
+            "model__n_neighbors": 10,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 2.3631835254588247,
+        "Test_R2": 0.8537528844440838,
+        "Train_RMSE": 0.5908271374515616,
+        "Train_R2": 0.9903645170387061,
+        "CV_R2": 0.8275205179352718,
+        "training_time": 3.227579355239868,
+        "prediction_time": 0.014683961868286133,
+        "best_params": {
+            "model__n_neighbors": 2,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 1.1722772410995623,
+        "Test_R2": 0.9640123841793422,
+        "Train_RMSE": 0.6013681214200816,
+        "Train_R2": 0.9900176355204472,
+        "CV_R2": 0.9248951941239061,
+        "training_time": 3.250070095062256,
+        "prediction_time": 0.019707918167114258,
+        "best_params": {
+            "model__n_neighbors": 10,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    }
+]

@@ -1,0 +1,488 @@
+[
+    {
+        "model": "KNN",
+        "baseline_corr": "msc",
+        "Test_RMSE": 2.7307670171389464,
+        "Test_R2": 0.8483691860630721,
+        "Train_RMSE": 2.6815963240423017,
+        "Train_R2": 0.8294521716276005,
+        "CV_R2": 0.7787673161495953,
+        "training_time": 12.453059911727905,
+        "prediction_time": 0.025360107421875,
+        "best_params": {
+            "model__n_neighbors": 40,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "msc",
+        "Test_RMSE": 3.940832119320015,
+        "Test_R2": 0.6842131528849997,
+        "Train_RMSE": 1.57295072085224,
+        "Train_R2": 0.9413200649973549,
+        "CV_R2": 0.4989260625310984,
+        "training_time": 13.078206300735474,
+        "prediction_time": 0.020070552825927734,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.003593813663804626
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "als",
+        "Test_RMSE": 2.8401258836987493,
+        "Test_R2": 0.8359813063829342,
+        "Train_RMSE": 2.470988332829582,
+        "Train_R2": 0.85518925754615,
+        "CV_R2": 0.7721845247634096,
+        "training_time": 12.373486518859863,
+        "prediction_time": 0.02335214614868164,
+        "best_params": {
+            "model__n_neighbors": 38,
+            "model__metric": "euclidean"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "als",
+        "Test_RMSE": 3.2218127428155774,
+        "Test_R2": 0.7889337672639971,
+        "Train_RMSE": 1.6384838266203965,
+        "Train_R2": 0.9363287012969214,
+        "CV_R2": 0.5416286726729793,
+        "training_time": 13.051042795181274,
+        "prediction_time": 0.02122664451599121,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.046415888336127795
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 1.9563734180257033,
+        "Test_R2": 0.9221745437571661,
+        "Train_RMSE": 2.18681009740206,
+        "Train_R2": 0.8865821183209603,
+        "CV_R2": 0.7839331028988211,
+        "training_time": 12.376383304595947,
+        "prediction_time": 0.024707555770874023,
+        "best_params": {
+            "model__n_neighbors": 16,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 2.9877948290476284,
+        "Test_R2": 0.8184819942904084,
+        "Train_RMSE": 1.4681684499027985,
+        "Train_R2": 0.9488776081601762,
+        "CV_R2": 0.5271382221151708,
+        "training_time": 13.098595380783081,
+        "prediction_time": 0.02037644386291504,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.01291549665014884
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 2.158613451920218,
+        "Test_R2": 0.905252463439419,
+        "Train_RMSE": 2.3478140115324155,
+        "Train_R2": 0.8692665353603957,
+        "CV_R2": 0.7773399709043375,
+        "training_time": 12.298359394073486,
+        "prediction_time": 0.024136066436767578,
+        "best_params": {
+            "model__n_neighbors": 22,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 2.6293890733551417,
+        "Test_R2": 0.8594185959377801,
+        "Train_RMSE": 1.5629802998916544,
+        "Train_R2": 0.9420616132003113,
+        "CV_R2": 0.5486815490273627,
+        "training_time": 13.04843807220459,
+        "prediction_time": 0.020321130752563477,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.001
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 2.2478746742972127,
+        "Test_R2": 0.8972546070251103,
+        "Train_RMSE": 2.2026416441794634,
+        "Train_R2": 0.8849339824272179,
+        "CV_R2": 0.7965555087356043,
+        "training_time": 12.520991086959839,
+        "prediction_time": 0.02254509925842285,
+        "best_params": {
+            "model__n_neighbors": 12,
+            "model__metric": "euclidean"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 4.171913066287148,
+        "Test_R2": 0.646093394190409,
+        "Train_RMSE": 1.5440591375325263,
+        "Train_R2": 0.943455905948758,
+        "CV_R2": 0.3931414748341299,
+        "training_time": 13.179839134216309,
+        "prediction_time": 0.020088911056518555,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.01291549665014884
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "snv",
+        "Test_RMSE": 2.1124727402115133,
+        "Test_R2": 0.9092596613634139,
+        "Train_RMSE": 2.2234318879043253,
+        "Train_R2": 0.8827515661307599,
+        "CV_R2": 0.7881398979813319,
+        "training_time": 12.279622554779053,
+        "prediction_time": 0.02448439598083496,
+        "best_params": {
+            "model__n_neighbors": 22,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "snv",
+        "Test_RMSE": 3.7081618106827636,
+        "Test_R2": 0.7204010586765921,
+        "Train_RMSE": 1.5170977797001275,
+        "Train_R2": 0.9454133382172132,
+        "CV_R2": 0.4392011749044749,
+        "training_time": 13.067169189453125,
+        "prediction_time": 0.02014303207397461,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.046415888336127795
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "none",
+        "Test_RMSE": 2.562080304794423,
+        "Test_R2": 0.8665238581632411,
+        "Train_RMSE": 2.3200122009190367,
+        "Train_R2": 0.8723443832279681,
+        "CV_R2": 0.7798368395694946,
+        "training_time": 12.390299558639526,
+        "prediction_time": 0.023646831512451172,
+        "best_params": {
+            "model__n_neighbors": 12,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "none",
+        "Test_RMSE": 2.5265606819643667,
+        "Test_R2": 0.8701991203471925,
+        "Train_RMSE": 1.6546011541033805,
+        "Train_R2": 0.9350699052829199,
+        "CV_R2": 0.6637256189346836,
+        "training_time": 13.192837953567505,
+        "prediction_time": 0.020200252532958984,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.1668100537200059
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 1.8957441362966234,
+        "Test_R2": 0.9269235213885043,
+        "Train_RMSE": 2.0092485978905152,
+        "Train_R2": 0.9042526553777959,
+        "CV_R2": 0.7691833389107698,
+        "training_time": 12.296992063522339,
+        "prediction_time": 0.024397850036621094,
+        "best_params": {
+            "model__n_neighbors": 10,
+            "model__metric": "manhattan"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 2.43258246239583,
+        "Test_R2": 0.8796757089199272,
+        "Train_RMSE": 1.6790179337787559,
+        "Train_R2": 0.9331394322062997,
+        "CV_R2": 0.5561472064000129,
+        "training_time": 13.04881501197815,
+        "prediction_time": 0.020033597946166992,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.1668100537200059
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "KNN",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 2.508824805513909,
+        "Test_R2": 0.87201506892938,
+        "Train_RMSE": 2.156157754977471,
+        "Train_R2": 0.8897393734228985,
+        "CV_R2": 0.7837729944183975,
+        "training_time": 12.352482318878174,
+        "prediction_time": 0.02268218994140625,
+        "best_params": {
+            "model__n_neighbors": 14,
+            "model__metric": "euclidean"
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 2.5421510242932763,
+        "Test_R2": 0.8685922848742987,
+        "Train_RMSE": 1.594014043003446,
+        "Train_R2": 0.9397379811664166,
+        "CV_R2": 0.7130219983304962,
+        "training_time": 13.011157035827637,
+        "prediction_time": 0.01996445655822754,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.001
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    }
+]

@@ -1,0 +1,308 @@
+[
+    {
+        "model": "CNN",
+        "baseline_corr": "als",
+        "Test_RMSE": 3.5840700393070186,
+        "Test_R2": 0.7388012195920508,
+        "Train_RMSE": 3.4580980749752475,
+        "Train_R2": 0.7163818611325437,
+        "CV_R2": 0.4074316041252232,
+        "training_time": 1089.98637342453,
+        "prediction_time": 0.977003812789917,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 3.864533775278766,
+        "Test_R2": 0.6963226622528851,
+        "Train_RMSE": 2.969698814484591,
+        "Train_R2": 0.7908373180913346,
+        "CV_R2": -0.06450775047893453,
+        "training_time": 1014.0537281036377,
+        "prediction_time": 0.6005220413208008,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 4.339637724493785,
+        "Test_R2": 0.6170649487023822,
+        "Train_RMSE": 3.4727700715060363,
+        "Train_R2": 0.7139700891644515,
+        "CV_R2": 0.4949843180022885,
+        "training_time": 1006.5625736713409,
+        "prediction_time": 0.7022242546081543,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 4.1288762350299875,
+        "Test_R2": 0.6533574278257479,
+        "Train_RMSE": 3.388047786108664,
+        "Train_R2": 0.7277559199276751,
+        "CV_R2": 0.41402702601251073,
+        "training_time": 1132.4507050514221,
+        "prediction_time": 0.9217188358306885,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "msc",
+        "Test_RMSE": 5.088647698134413,
+        "Test_R2": 0.4734702221365721,
+        "Train_RMSE": 3.68205864085802,
+        "Train_R2": 0.6784557170399306,
+        "CV_R2": 0.34066260453677133,
+        "training_time": 1072.5873816013336,
+        "prediction_time": 1.0256404876708984,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 5.140414710980999,
+        "Test_R2": 0.46270291497620164,
+        "Train_RMSE": 4.237026122490629,
+        "Train_R2": 0.5742235136659689,
+        "CV_R2": 0.46055690619070005,
+        "training_time": 1152.855797290802,
+        "prediction_time": 1.077577829360962,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "snv",
+        "Test_RMSE": 3.4772140267273777,
+        "Test_R2": 0.7541438850628827,
+        "Train_RMSE": 2.6944293245292923,
+        "Train_R2": 0.8278159243636695,
+        "CV_R2": 0.4380274177246499,
+        "training_time": 1129.2299530506134,
+        "prediction_time": 1.1761000156402588,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 3.0493627361572977,
+        "Test_R2": 0.8109240259152415,
+        "Train_RMSE": 3.1741005898359425,
+        "Train_R2": 0.7610534512436266,
+        "CV_R2": 0.012977178549259338,
+        "training_time": 1008.489019870758,
+        "prediction_time": 0.5449836254119873,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "CNN",
+        "baseline_corr": "none",
+        "Test_RMSE": 5.867778096093615,
+        "Test_R2": 0.29989120724681473,
+        "Train_RMSE": 3.998764002938129,
+        "Train_R2": 0.620762793902524,
+        "CV_R2": -0.036185654024563474,
+        "training_time": 1054.9800922870636,
+        "prediction_time": 0.574040412902832,
+        "best_params": {
+            "model__model_kwargs": {
+                "optimizer": "adam",
+                "regularizer": 0.001,
+                "kernel": 5
+            },
+            "model__fit_kwargs": {
+                "epochs": 50,
+                "batch_size": 8
+            }
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    }
+]

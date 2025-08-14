@@ -1,0 +1,280 @@
+[{
+        "model": "Random Forest",
+        "baseline_corr": "none",
+        "Test_RMSE": 2.5126093558655778,
+        "Test_R2": 0.8716286483660185,
+        "Train_RMSE": 0.8443735275507034,
+        "Train_R2": 0.9830905840006234,
+        "CV_R2": 0.7721394473067645,
+        "training_time": 1249.4505941867828,
+        "prediction_time": 0.022224903106689453,
+        "best_params": {
+            "model__n_estimators": 100,
+            "model__min_samples_split": 10,
+            "model__min_samples_leaf": 2,
+            "model__max_features": "log2",
+            "model__max_depth": 20,
+            "model__bootstrap": false
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "als",
+        "Test_RMSE": 2.136162145914108,
+        "Test_R2": 0.9072131142575615,
+        "Train_RMSE": 3.66205343881779e-15,
+        "Train_R2": 1.0,
+        "CV_R2": 0.7973200294722615,
+        "training_time": 449.72342443466187,
+        "prediction_time": 0.021780967712402344,
+        "best_params": {
+            "model__n_estimators": 20,
+            "model__min_samples_split": 2,
+            "model__min_samples_leaf": 1,
+            "model__max_features": "sqrt",
+            "model__max_depth": 100,
+            "model__bootstrap": false
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 1.881232241726393,
+        "Test_R2": 0.9280380380158381,
+        "Train_RMSE": 0.8188438994717349,
+        "Train_R2": 0.9840976383404624,
+        "CV_R2": 0.824036128431983,
+        "training_time": 863.9823219776154,
+        "prediction_time": 0.03351330757141113,
+        "best_params": {
+            "model__n_estimators": 50,
+            "model__min_samples_split": 2,
+            "model__min_samples_leaf": 1,
+            "model__max_features": null,
+            "model__max_depth": 10,
+            "model__bootstrap": true
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 1.9802153840443784,
+        "Test_R2": 0.9202660959543351,
+        "Train_RMSE": 0.9819401402625427,
+        "Train_R2": 0.9771319349997634,
+        "CV_R2": 0.8183839471396046,
+        "training_time": 1410.670456647873,
+        "prediction_time": 0.026012659072875977,
+        "best_params": {
+            "model__n_estimators": 20,
+            "model__min_samples_split": 5,
+            "model__min_samples_leaf": 2,
+            "model__max_features": null,
+            "model__max_depth": 20,
+            "model__bootstrap": true
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 2.1656740225307396,
+        "Test_R2": 0.9046316336792082,
+        "Train_RMSE": 0.16401209285160143,
+        "Train_R2": 0.9993620140253895,
+        "CV_R2": 0.8135103761662922,
+        "training_time": 982.6021287441254,
+        "prediction_time": 0.027658700942993164,
+        "best_params": {
+            "model__n_estimators": 20,
+            "model__min_samples_split": 5,
+            "model__min_samples_leaf": 1,
+            "model__max_features": "sqrt",
+            "model__max_depth": 50,
+            "model__bootstrap": false
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "msc",
+        "Test_RMSE": 2.148174670858108,
+        "Test_R2": 0.9061666218610256,
+        "Train_RMSE": 1.08895507313802,
+        "Train_R2": 0.9718758558286733,
+        "CV_R2": 0.8272070402329179,
+        "training_time": 1401.333725452423,
+        "prediction_time": 0.02873992919921875,
+        "best_params": {
+            "model__n_estimators": 100,
+            "model__min_samples_split": 10,
+            "model__min_samples_leaf": 4,
+            "model__max_features": null,
+            "model__max_depth": 100,
+            "model__bootstrap": true
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 2.4785665812253135,
+        "Test_R2": 0.8750836320239527,
+        "Train_RMSE": 1.0632123010138748,
+        "Train_R2": 0.9731898418537374,
+        "CV_R2": 0.8026485511292946,
+        "training_time": 481.18820357322693,
+        "prediction_time": 0.04731869697570801,
+        "best_params": {
+            "model__n_estimators": 200,
+            "model__min_samples_split": 5,
+            "model__min_samples_leaf": 2,
+            "model__max_features": "log2",
+            "model__max_depth": 10,
+            "model__bootstrap": true
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "snv",
+        "Test_RMSE": 1.970636439476432,
+        "Test_R2": 0.921035627753338,
+        "Train_RMSE": 1.136284341657286,
+        "Train_R2": 0.9693780082897105,
+        "CV_R2": 0.825384125516783,
+        "training_time": 752.9955585002899,
+        "prediction_time": 0.020986318588256836,
+        "best_params": {
+            "model__n_estimators": 20,
+            "model__min_samples_split": 10,
+            "model__min_samples_leaf": 4,
+            "model__max_features": null,
+            "model__max_depth": 20,
+            "model__bootstrap": true
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Random Forest",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 2.0040395584409745,
+        "Test_R2": 0.9183359811209184,
+        "Train_RMSE": 0.3663169342633848,
+        "Train_R2": 0.9968174635795993,
+        "CV_R2": 0.8232694703812612,
+        "training_time": 1368.2032024860382,
+        "prediction_time": 0.024047374725341797,
+        "best_params": {
+            "model__n_estimators": 50,
+            "model__min_samples_split": 5,
+            "model__min_samples_leaf": 2,
+            "model__max_features": "log2",
+            "model__max_depth": 100,
+            "model__bootstrap": false
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    }
+]

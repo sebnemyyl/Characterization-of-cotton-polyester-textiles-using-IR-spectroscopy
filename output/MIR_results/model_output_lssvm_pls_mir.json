@@ -1,0 +1,479 @@
+[
+    {
+        "model": "LSSVM",
+        "baseline_corr": "msc",
+        "Test_RMSE": 2.399690898627868,
+        "Test_R2": 0.8829075811642032,
+        "Train_RMSE": 1.7618277744650983,
+        "Train_R2": 0.9263816134722254,
+        "CV_R2": 0.7696231985141878,
+        "training_time": 5.9260640144348145,
+        "prediction_time": 0.02214813232421875,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "msc",
+        "Test_RMSE": 2.5366990295244913,
+        "Test_R2": 0.8691553245383261,
+        "Train_RMSE": 2.3977605619658022,
+        "Train_R2": 0.8636450162423821,
+        "CV_R2": 0.7402481747601904,
+        "training_time": 53.955029249191284,
+        "prediction_time": 0.0204770565032959,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "als",
+        "Test_RMSE": 2.9441523691890614,
+        "Test_R2": 0.8237461007844141,
+        "Train_RMSE": 0.4251054406572366,
+        "Train_R2": 0.9957139945682425,
+        "CV_R2": 0.7333389369964969,
+        "training_time": 5.762163162231445,
+        "prediction_time": 0.02187800407409668,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "als",
+        "Test_RMSE": 2.76626131347293,
+        "Test_R2": 0.8444017977024063,
+        "Train_RMSE": 1.1676780075355127,
+        "Train_R2": 0.967662563283381,
+        "CV_R2": 0.750099562658519,
+        "training_time": 40.896910667419434,
+        "prediction_time": 0.02057480812072754,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 2.0251568107722258,
+        "Test_R2": 0.9166058699426628,
+        "Train_RMSE": 1.628688312513444,
+        "Train_R2": 0.9370877307736442,
+        "CV_R2": 0.7890183128799589,
+        "training_time": 5.7388997077941895,
+        "prediction_time": 0.02174997329711914,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 2.1777428725139125,
+        "Test_R2": 0.9035657358587418,
+        "Train_RMSE": 2.0995681875630736,
+        "Train_R2": 0.8954511264092053,
+        "CV_R2": 0.7878903019852246,
+        "training_time": 55.63437604904175,
+        "prediction_time": 0.020250797271728516,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 2.2836202266836487,
+        "Test_R2": 0.8939609249430571,
+        "Train_RMSE": 1.648518412805973,
+        "Train_R2": 0.935546427365634,
+        "CV_R2": 0.7651355153276986,
+        "training_time": 5.7777509689331055,
+        "prediction_time": 0.02155756950378418,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 2.6764636247970883,
+        "Test_R2": 0.8543398142132995,
+        "Train_RMSE": 2.2387602682422303,
+        "Train_R2": 0.8811293678869933,
+        "CV_R2": 0.7544603732674555,
+        "training_time": 57.310547828674316,
+        "prediction_time": 0.020508289337158203,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 2.704203723058517,
+        "Test_R2": 0.8513047889730003,
+        "Train_RMSE": 0.8239246468046245,
+        "Train_R2": 0.9838996847572968,
+        "CV_R2": 0.7557801511392759,
+        "training_time": 5.760487794876099,
+        "prediction_time": 0.021782636642456055,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 2.4312814050233715,
+        "Test_R2": 0.8798043844683632,
+        "Train_RMSE": 1.6490640337135167,
+        "Train_R2": 0.9355037550651201,
+        "CV_R2": 0.796831600410326,
+        "training_time": 47.537087202072144,
+        "prediction_time": 0.021552562713623047,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "snv",
+        "Test_RMSE": 1.9722784756257907,
+        "Test_R2": 0.9209039785339997,
+        "Train_RMSE": 1.670232481575547,
+        "Train_R2": 0.9338372967452642,
+        "CV_R2": 0.8015595928758388,
+        "training_time": 5.758184909820557,
+        "prediction_time": 0.021934986114501953,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "snv",
+        "Test_RMSE": 2.0915701040778156,
+        "Test_R2": 0.9110465042302258,
+        "Train_RMSE": 2.2874677484772716,
+        "Train_R2": 0.8759006948863511,
+        "CV_R2": 0.7765612729664277,
+        "training_time": 54.19163990020752,
+        "prediction_time": 0.02070331573486328,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "none",
+        "Test_RMSE": 2.3122695612021156,
+        "Test_R2": 0.8912835924255954,
+        "Train_RMSE": 1.5956611741607243,
+        "Train_R2": 0.9396133765774091,
+        "CV_R2": 0.81326919048316,
+        "training_time": 5.770390033721924,
+        "prediction_time": 0.021973609924316406,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.1
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "none",
+        "Test_RMSE": 2.424946563705173,
+        "Test_R2": 0.8804299214286782,
+        "Train_RMSE": 1.6700306259213802,
+        "Train_R2": 0.9338532879427377,
+        "CV_R2": 0.7835014370422873,
+        "training_time": 52.42133951187134,
+        "prediction_time": 0.020473480224609375,
+        "best_params": {
+            "model__n_components": 10
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 3.2851415126421273,
+        "Test_R2": 0.7805546749665045,
+        "Train_RMSE": 0.7301759372965567,
+        "Train_R2": 0.9873551283863414,
+        "CV_R2": 0.6084885446552898,
+        "training_time": 5.6863791942596436,
+        "prediction_time": 0.02173757553100586,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 3.2265360148431372,
+        "Test_R2": 0.7883144550493896,
+        "Train_RMSE": 1.4447938795227118,
+        "Train_R2": 0.9504924793861845,
+        "CV_R2": 0.6299565196313439,
+        "training_time": 49.773534059524536,
+        "prediction_time": 0.02037191390991211,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "LSSVM",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 3.5264767480024006,
+        "Test_R2": 0.7471283058855431,
+        "Train_RMSE": 0.7352685466343277,
+        "Train_R2": 0.9871781300749444,
+        "CV_R2": 0.6543522433372593,
+        "training_time": 5.685317516326904,
+        "prediction_time": 0.021938085556030273,
+        "best_params": {
+            "model__sigma": 1.0,
+            "model__gamma": 0.01
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "PLS",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 3.2308113859095746,
+        "Test_R2": 0.7877530890118416,
+        "Train_RMSE": 1.5742134306892572,
+        "Train_R2": 0.9412258147822505,
+        "CV_R2": 0.6951077567666718,
+        "training_time": 51.08731770515442,
+        "prediction_time": 0.021363019943237305,
+        "best_params": {
+            "model__n_components": 5
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": false,
+                "n_comps": 15
+            }
+        }
+    }
+]

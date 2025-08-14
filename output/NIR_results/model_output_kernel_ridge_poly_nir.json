@@ -1,0 +1,272 @@
+[
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "detrendsnv",
+        "Test_RMSE": 1.0981284824586122,
+        "Test_R2": 0.968420974736808,
+        "Train_RMSE": 0.5589719141365893,
+        "Train_R2": 0.9913755264961812,
+        "CV_R2": 0.8886844882833114,
+        "training_time": 5.9644646644592285,
+        "prediction_time": 0.01435542106628418,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.01291549665014884
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "none",
+        "Test_RMSE": 1.2036210140680847,
+        "Test_R2": 0.9620622184508972,
+        "Train_RMSE": 0.5091362040232883,
+        "Train_R2": 0.992844819751614,
+        "CV_R2": 0.9019239858204919,
+        "training_time": 4.194706201553345,
+        "prediction_time": 0.013029813766479492,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.001
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "snv",
+        "Test_RMSE": 0.9178127474932544,
+        "Test_R2": 0.9779402503672425,
+        "Train_RMSE": 0.5134127879741166,
+        "Train_R2": 0.9927241123934588,
+        "CV_R2": 0.9088769439294362,
+        "training_time": 4.315846681594849,
+        "prediction_time": 0.01049351692199707,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.003593813663804626
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "msc",
+        "Test_RMSE": 0.9862474094147093,
+        "Test_R2": 0.9745279347015773,
+        "Train_RMSE": 0.4886836051751469,
+        "Train_R2": 0.9934081372474016,
+        "CV_R2": 0.9203379085270007,
+        "training_time": 3.923687219619751,
+        "prediction_time": 0.01106405258178711,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.003593813663804626
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "detrend3",
+        "Test_RMSE": 1.149826054445868,
+        "Test_R2": 0.9653776375071639,
+        "Train_RMSE": 0.6440243643116071,
+        "Train_R2": 0.9885512726349139,
+        "CV_R2": 0.9001618621840248,
+        "training_time": 4.304401874542236,
+        "prediction_time": 0.011169672012329102,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.1668100537200059
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "snvsavgol",
+        "Test_RMSE": 1.7257572472127678,
+        "Test_R2": 0.9220076834279552,
+        "Train_RMSE": 0.8434954775729089,
+        "Train_R2": 0.9803610558506184,
+        "CV_R2": 0.8853536383033097,
+        "training_time": 4.257710695266724,
+        "prediction_time": 0.011127233505249023,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.001
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "als",
+        "Test_RMSE": 1.703310363955576,
+        "Test_R2": 0.9240233769707499,
+        "Train_RMSE": 0.9939671755055134,
+        "Train_R2": 0.9727292737784479,
+        "CV_R2": 0.8673437095468143,
+        "training_time": 4.359738826751709,
+        "prediction_time": 0.01263284683227539,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.046415888336127795
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "detrend",
+        "Test_RMSE": 1.1432006141521978,
+        "Test_R2": 0.9657754846640432,
+        "Train_RMSE": 0.5308045200396081,
+        "Train_R2": 0.9922228255093489,
+        "CV_R2": 0.9144422683086948,
+        "training_time": 4.532141923904419,
+        "prediction_time": 0.013741016387939453,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.001
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "savgol",
+        "Test_RMSE": 1.225745031572305,
+        "Test_R2": 0.9606547153539645,
+        "Train_RMSE": 0.5297796898571253,
+        "Train_R2": 0.9922528274731407,
+        "CV_R2": 0.8990461674096951,
+        "training_time": 4.129708766937256,
+        "prediction_time": 0.012500286102294922,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.001
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    },
+    {
+        "model": "Kernel Ridge poly",
+        "baseline_corr": "fillpeaks",
+        "Test_RMSE": 1.8848724922442,
+        "Test_R2": 0.9069628579102527,
+        "Train_RMSE": 0.8480975047463799,
+        "Train_R2": 0.9801461750212052,
+        "CV_R2": 0.8843767705568311,
+        "training_time": 4.28737998008728,
+        "prediction_time": 0.01255941390991211,
+        "best_params": {
+            "model__degree": 2,
+            "model__alpha": 0.001
+        },
+        "settings": {
+            "split": {
+                "type": "attribute",
+                "attribute": "reference.specimen",
+                "test_value": 1
+            },
+            "scale": true,
+            "pca": {
+                "enabled": true,
+                "n_comps": 15
+            }
+        }
+    }
+]
