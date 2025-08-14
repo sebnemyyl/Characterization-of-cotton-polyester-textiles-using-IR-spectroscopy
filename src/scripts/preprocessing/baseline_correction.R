@@ -29,11 +29,13 @@ save_csv_with_baseline_corr <- function(spectra_df_clean, output_dir, file_namin
 }
 
 
-csv_path <- "input/clean_csv/spectra_nir_all.csv"
-file_naming <- "nir_all_regression"
+#csv_path <- "input/clean_csv/models/spectra_mir_fixed.csv"
+#csv_path <- "temp/spectra_treated/mir/regression/spectra_spectra_treated_mir_detrend.csv"
+
+file_naming <- "spectra_treated_mir"
 spectra_df <- load_saved_csv(csv_path)
 
-output_dir <- "temp/spectra_treated/nir"
+output_dir <- "temp/spectra_treated/mir/regression"
 baseline_corr_types <- list( "snv", "detrend", "als", "fillpeaks", "msc", "savgol")
 for (baseline_corr in baseline_corr_types) {
   save_csv_with_baseline_corr(spectra_df, output_dir, file_naming, baseline_corr)

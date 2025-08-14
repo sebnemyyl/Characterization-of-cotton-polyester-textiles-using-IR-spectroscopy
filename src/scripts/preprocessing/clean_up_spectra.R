@@ -8,7 +8,7 @@ source("src/util/05_data_analysis_plot_spectra.R")
 source("src/util/04_data_prep_baseline_correction.R")
 
 input_path <- "input/raw_csv/spectra_nir_250127.csv"
-output_path <- "input/clean_csv/spectra_reproducibility_41.85.csv"
+output_path <- "input/clean_csv/models/spectra_nir_fixed.csv"
 type <- "nir"
 
 spectra_df_full <- load_csv(input_path)
